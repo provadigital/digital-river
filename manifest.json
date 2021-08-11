@@ -1,14 +1,14 @@
 {
   "name": "connector-digital-river",
-  "vendor": "vtexus",
-  "version": "0.0.22",
+  "vendor": "vinneren",
+  "version": "0.0.20",
   "title": "Digital River",
   "description": "Implementation of Digital River payment method, credit card processing, and tax calculation",
   "mustUpdateAt": "2018-01-04",
   "categories": [],
   "billingOptions": {
     "support": {
-      "url": "https://help-tickets.vtex.com/en/support?app=vtexus.connector-digital-river"
+      "url": "https://help-tickets.vtex.com/en/support?app=vinneren.connector-digital-river"
     },
     "type": "free",
     "availableCountries": [
@@ -47,10 +47,27 @@
       }
     },
     {
+      "name": "outbound-access",
+      "attrs": {
+        "host": "{{account}}.vtexcommercestable.com.br",
+        "path": "/api/*"
+      }
+    },
+    {
+      "name": "outbound-access",
+      "attrs": {
+        "host": "api.vtex.com",
+        "path": "/api/dataentities/*"
+      }
+    },
+    {
       "name": "ViewPayments"
     },
     {
       "name": "LogisticsViewer"
+    },
+    {
+      "name": "ADMIN_DS"
     },
     {
       "name": "colossus-fire-event"

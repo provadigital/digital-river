@@ -1,5 +1,8 @@
 {
   "admin/digital-river.title": "Digital River",
+  "admin/digital-river.configuration-label": "Configuration",
+  "admin/digital-river.catalog-logs-label": "Catalog Sync Logs",
+  "admin/digital-river.catalogLogs.success": "Catalog Sync has started",
   "admin/digital-river.admin-menu-button": "Digital River",
   "admin/digital-river.settings.digitalRiverToken.label": "Digital River token",
   "admin/digital-river.settings.digitalRiverToken.helpText": "Enter your Digital River API secret key",

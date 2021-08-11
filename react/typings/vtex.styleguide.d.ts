@@ -12,6 +12,7 @@ declare module 'vtex.styleguide' {
   export const IconWarning
   export const IconCheck
   export const Input
+  export const InputPassword
   export const InputSearch
   export const IconCaretDown
   export const IconCaretUp

@@ -3,8 +3,10 @@ import { IOClients } from '@vtex/api'
 import DigitalRiver from './digitalRiver'
 import CheckoutClient from './checkout'
 import LogisticsClient from './logistics'
+import CatalogClient from './catalog'
 import OrderFormClient from './orderform'
 import OrdersClient from './orders'
+import Session from './session'
 
 // Extend the default IOClients implementation with our own custom clients.
 export class Clients extends IOClients {
@@ -26,5 +28,13 @@ export class Clients extends IOClients {
 
   public get orders() {
     return this.getOrSet('orders', OrdersClient)
+  }
+
+  public get catalog() {
+    return this.getOrSet('catalog', CatalogClient)
+  }
+
+  public get customSession() {
+    return this.getOrSet('customSession', Session)
   }
 }

@@ -6,12 +6,14 @@ import {
   Layout,
   PageHeader,
   PageBlock,
+  InputPassword,
   Input,
   Button,
   Toggle,
   ToastProvider,
   ToastConsumer,
 } from 'vtex.styleguide'
+
 import { useRuntime } from 'vtex.render-runtime'
 
 import AppSettings from './graphql/appSettings.graphql'
@@ -127,7 +129,7 @@ const Admin: FC = () => {
           authorizationHeader: settingsState.digitalRiverToken,
           allowExecutionAfterErrors: false,
           integratedAuthentication: false,
-          appId: 'vtexus.connector-digital-river',
+          appId: 'vinneren.connector-digital-river',
         }
         updateOrderForm = true
       }
@@ -137,7 +139,7 @@ const Admin: FC = () => {
       if (
         !settingsState.enableTaxCalculation &&
         orderFormData?.orderFormConfiguration?.taxConfiguration?.appId ===
-          'vtexus.connector-digital-river'
+          'vinneren.connector-digital-river'
       ) {
         orderFormData.orderFormConfiguration.taxConfiguration = {}
         updateOrderForm = true
@@ -159,13 +161,19 @@ const Admin: FC = () => {
       }
     }
 
+    await fetch(
+      `/_v/api/digital-river/setup`, {
+        method: 'POST',
+        cache: 'no-cache'
+      }
+    );
     await saveSettings({
       variables: {
         version: process.env.VTEX_APP_VERSION,
         settings: JSON.stringify(settingsState),
       },
     })
-      .catch((err) => {
+    .catch((err) => {
         console.error(err)
         showToast({
           message: formatMessage({
@@ -174,17 +182,19 @@ const Admin: FC = () => {
           duration: 5000,
         })
         setSettingsLoading(false)
+    })
+    .then(() => {
+      showToast({
+        message: formatMessage({
+          id: 'admin/digital-river.saveSettings.success',
+        }),
+        duration: 5000,
       })
-      .then(() => {
-        showToast({
-          message: formatMessage({
-            id: 'admin/digital-river.saveSettings.success',
-          }),
-          duration: 5000,
-        })
-        refetch()
-        setSettingsLoading(false)
-      })
+      refetch()
+      setSettingsLoading(false)
+    });
+      //create schema
+      //create fields
   }
 
   return (
@@ -195,14 +205,14 @@ const Admin: FC = () => {
             pageHeader={
               <PageHeader
                 title={formatMessage({
-                  id: 'admin/digital-river.title',
+                  id: 'admin/digital-river.configuration-label',
                 })}
               />
             }
           >
             <PageBlock>
               <section className="pb4">
-                <Input
+                <InputPassword
                   label={formatMessage({
                     id: 'admin/digital-river.settings.digitalRiverToken.label',
                   })}
@@ -236,7 +246,7 @@ const Admin: FC = () => {
                 />
               </section>
               <section className="pb4">
-                <Input
+                <InputPassword
                   label={formatMessage({
                     id: 'admin/digital-river.settings.vtexAppToken.label',
                   })}

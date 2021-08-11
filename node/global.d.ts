@@ -108,8 +108,16 @@ interface DRCheckoutResponse {
   applicationId: string
   customerType: string
   paymentSessionId: string
+  payment: DRPayment
   sellingEntity: SellingEntity
   liveMode: boolean
+}
+interface DRPayment {
+  session: DRSession
+  sources?: Source[]
+}
+interface DRSession {
+  id: string
 }
 interface DRCreditCard {
   cvv: string
@@ -161,6 +169,7 @@ interface DROrderResponse {
   fraudState: string
   fraudStateTransitions: FraudStateTransitions
   sources: Source[]
+  payment: DRPayment
   charges: Charge[]
   liveMode: boolean
   updatedTime: string
@@ -448,4 +457,31 @@ interface Tax {
 interface Hook {
   major: number
   url: string
+}
+
+interface DRSkuPayload {
+  eccn: string
+  countryOfOrigin: string
+  taxCode: string
+  name: string
+}
+
+interface DRSkuResponse {
+  id: string
+}
+
+interface DRCustomerPayload {
+  email?: string
+  id?: string
+}
+
+interface DRCustomersResponse {
+  hasMore: boolean
+  data: DRCustomerResponse[]
+}
+
+interface DRCustomerResponse {
+  id: string
+  email: string
+  enabled: boolean
 }
