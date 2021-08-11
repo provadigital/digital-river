@@ -27,13 +27,13 @@ This app integrates Digital River with VTEX checkout, allowing shoppers to inter
 4. Add the following JavaScript to your `checkout6-custom.js` file, which is typically edited by accessing the **Store Setup** section in your admin sidebar and clicking `Checkout`, then clicking the blue gear icon and then the `Code` tab:
 
 ```js
-// DIGITAL RIVER Version 0.0.18
+// DIGITAL RIVER Version 0.0.22
 let checkoutUpdated = false
 const digitalRiverPaymentGroupClass = '.DigitalRiverPaymentGroup'
 const digitalRiverPaymentGroupButtonID =
   'payment-group-DigitalRiverPaymentGroup'
 
-const digitalRiverPublicKey = 'pk_test_1234567890' // NOTE! Enter your Digital River public API key here
+const digitalRiverPublicKey = 'pk_test_67bcac8015da4adb97d4671d7a43c7f2' // NOTE! Enter your Digital River public API key here
 
 const paymentErrorTitle = 'Unable to check out with selected payment method.'
 const paymentErrorDescription =
@@ -129,6 +129,52 @@ function loadDigitalRiver() {
   u.parentNode.insertBefore(f, u)
 }
 
+function loadStoredCards(checkoutId) {
+  fetch(`${__RUNTIME__.rootPath || ``}/_v/api/digital-river/checkout/sources`)
+    .then((response) => {
+      return response.json()
+    })
+    .then(async (response) => {
+      if (response.customer && response.customer.sources) {
+        var sources = response.customer.sources;
+        if (sources.length > 0) {
+          var radiosHtmls = '';
+          for (var i = 0; i < sources.length; i++) {
+            radiosHtmls += '<input name="DR-stored-cards" type="radio" id="' + sources[i].id + '" value="' + sources[i].id + '">';
+            radiosHtmls += '<label style="display: inline-block; vertical-align: sub; margin-bottom: 8px; margin-left: 4px; font-size: 0.875rem" for="' + sources[i].id + '">' + sources[i].creditCard.brand + ' ending with ' + sources[i].creditCard.lastFourDigits + '</label></br>';
+          }
+          radiosHtmls += '<div class="stored-credit-cards"><button id="submit-stored-creditCard" style="background-color: #1264a3; color: #FFF; height: 56px; border-radius: .25rem; text-align: center; border-top: none!important; border: none; font-weight: 400; padding: 1rem; width: 250px; margin-bottom: 24px;">USE CARD</button></div>';
+      
+          $('#drop-in').prepend('<div class="DR-stored-cards">' + radiosHtmls + '</div>');
+          $('#submit-stored-creditCard').click(function() {
+            console.log('CHE', checkoutId)
+            var sourceId = $('input[name=DR-stored-cards]:checked').attr('id');
+            fetch(
+              `${
+                __RUNTIME__.rootPath || ``
+              }/_v/api/digital-river/checkout/update`,
+              {
+                method: 'POST',
+                body: JSON.stringify({ checkoutId, sourceId, readyForStorage: false }),
+              }
+            )
+              .then((rawResponse) => {
+                return rawResponse.json()
+              })
+              .then(() => {
+                checkoutUpdated = true
+                clickBuyNowButton()
+              });
+          })
+          $('#' + sources[0].id).click();
+        }
+      }
+    });
+  
+  
+  
+}
+
 async function initDigitalRiver(orderForm) {
   hideBuyNowButton()
 
@@ -150,7 +196,6 @@ async function initDigitalRiver(orderForm) {
     $(digitalRiverPaymentGroupClass).html(
       `<div><div class='DR-card'><div class='DR-collapse DR-show'><h5 class='DR-error-message'>${loginMessage}</h5><div><a style='cursor: pointer;' onClick='window.vtexid.start()' class='DR-button-text'>${loginButtonText}</a></div></div></div></div>`
     )
-
     return
   }
 
@@ -175,7 +220,7 @@ async function initDigitalRiver(orderForm) {
       const digitalriver = new DigitalRiver(digitalRiverPublicKey, {
         locale: orderForm.clientPreferencesData.locale
           ? orderForm.clientPreferencesData.locale.toLowerCase()
-          : 'en-us',
+          : 'en_US',
       })
 
       const country = await getCountryCode(
@@ -186,12 +231,12 @@ async function initDigitalRiver(orderForm) {
         sessionId: paymentSessionId,
         options: {
           flow: 'checkout',
-          showSavePaymentAgreement: false,
+          showComplianceSection: true,
+          showSavePaymentAgreement: true,
+          showTermsOfSaleDisclosure: true,
           button: {
             type: 'buyNow',
           },
-          showComplianceSection: true,
-          showTermsOfSaleDisclosure: false,
         },
         billingAddress: {
           firstName: orderForm.clientProfileData.firstName,
@@ -212,13 +257,14 @@ async function initDigitalRiver(orderForm) {
           },
         },
         onSuccess(data) {
+
           fetch(
             `${
               __RUNTIME__.rootPath || ``
             }/_v/api/digital-river/checkout/update`,
             {
               method: 'POST',
-              body: JSON.stringify({ checkoutId, sourceId: data.source.id }),
+              body: JSON.stringify({ checkoutId, sourceId: data.source.id, readyForStorage: data.readyForStorage }),
             }
           )
             .then((rawResponse) => {
@@ -234,7 +280,9 @@ async function initDigitalRiver(orderForm) {
           console.error(data)
           renderErrorMessage(paymentErrorTitle, paymentErrorDescription, true)
         },
-        onReady(data) {},
+        onReady(data) {
+          loadStoredCards(checkoutId);
+        },
       }
 
       const dropin = digitalriver.createDropin(configuration)
@@ -279,6 +327,7 @@ $(window).on('orderFormUpdated.vtex', function (evt, orderForm) {
     }
   }
 })
+
 ```
 
 5. In your admin sidebar, access the **Transactions** section and click `Payments > Settings`.
