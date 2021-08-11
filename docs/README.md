@@ -147,7 +147,6 @@ function loadStoredCards(checkoutId) {
       
           $('#drop-in').prepend('<div class="DR-stored-cards">' + radiosHtmls + '</div>');
           $('#submit-stored-creditCard').click(function() {
-            console.log('CHE', checkoutId)
             var sourceId = $('input[name=DR-stored-cards]:checked').attr('id');
             fetch(
               `${
