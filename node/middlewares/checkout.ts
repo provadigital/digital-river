@@ -1,14 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AuthenticationError, ResolverError, UserInputError } from '@vtex/api'
 import { json } from 'co-body'
 import convertIso3To2 from 'country-iso-3-to-2'
 
-import {
-  applicationId
- } from '../constants'
+import { applicationId } from '../constants'
 import { getSession } from '../resolvers/session/service'
-import { SessionFields } from '../resolvers/session/sessionResolver'
+import type { SessionFields } from '../resolvers/session/sessionResolver'
 
- 
 interface CreateCheckoutRequest {
   orderFormId: string
 }
@@ -181,18 +179,21 @@ export async function digitalRiverCreateCheckout(
     ({ id }: { id: string }) => id === 'Shipping'
   )?.value
 
-  const sessionData : SessionFields = await getSession(ctx)
+  const sessionData: SessionFields = await getSession(ctx)
 
-  const profileData = sessionData.impersonate && sessionData.impersonate.profile ? sessionData.impersonate.profile : sessionData.profile
+  const profileData = sessionData.impersonate?.profile
+    ? sessionData.impersonate.profile
+    : sessionData.profile
 
   let customersResponse = null
-  let customerId = profileData && profileData.id
-  let email = profileData && profileData.email
+  const customerId = profileData?.id
+  const email = profileData?.email
+
   if (customerId) {
     try {
       customersResponse = await digitalRiver.getCustomerById({
         settings,
-        customerId
+        customerId,
       })
     } catch (err) {
       if (err.response.status !== 404) {
@@ -201,7 +202,7 @@ export async function digitalRiverCreateCheckout(
           email,
           message: 'DigitalRiverCreateCheckout-getCustomersFailure',
         })
-    
+
         throw new ResolverError({
           message: 'Get customer failed',
           error: err,
@@ -209,15 +210,17 @@ export async function digitalRiverCreateCheckout(
       }
     }
   }
+
   if (!customersResponse) {
     try {
       const customerPayload: DRCustomerPayload = {
         id: customerId,
-        email
+        email,
       }
+
       customersResponse = await digitalRiver.createCustomer({
         settings,
-        customerPayload
+        customerPayload,
       })
     } catch (err) {
       logger.error({
@@ -226,7 +229,7 @@ export async function digitalRiverCreateCheckout(
         email,
         message: 'DigitalRiverCreateCheckout-createCustomerFailure',
       })
-  
+
       throw new ResolverError({
         message: 'Create customer failed',
         error: err,
@@ -238,7 +241,7 @@ export async function digitalRiverCreateCheckout(
     applicationId,
     currency: orderFormData?.storePreferencesData?.currencyCode ?? 'USD',
     taxInclusive: true,
-    customerId: customerId,
+    customerId,
     email: orderFormData.clientProfileData?.email ?? '',
     locale: locale.replace('-', '_'),
     browserIp,
@@ -308,7 +311,8 @@ export async function digitalRiverCreateCheckout(
 
   ctx.body = {
     checkoutId: checkoutResponse.id,
-    paymentSessionId: checkoutResponse.payment.session.id,
+    paymentSessionId:
+      checkoutResponse.paymentSessionId || checkoutResponse.payment.session.id,
   }
 
   await next()
@@ -354,22 +358,27 @@ export async function digitalRiverUpdateCheckout(
   })
 
   if (updateCheckoutRequest.readyForStorage) {
-    const sessionData : SessionFields = await getSession(ctx)
+    const sessionData: SessionFields = await getSession(ctx)
 
-    const profileData = sessionData.impersonate && sessionData.impersonate.profile ? sessionData.impersonate.profile : sessionData.profile
+    const profileData = sessionData.impersonate?.profile
+      ? sessionData.impersonate.profile
+      : sessionData.profile
 
-    let customerId = profileData && profileData.id
+    const customerId = profileData?.id
 
     if (customerId) {
       try {
-        await digitalRiver.attachSourceCustomer({ settings, customerId, sourceId});
+        await digitalRiver.attachSourceCustomer({
+          settings,
+          customerId,
+          sourceId,
+        })
       } catch (err) {
         logger.error({
           error: err,
           message: 'DigitalRiverUpdateCheckout-attachSourceCustomer',
         })
-        
-    
+
         throw new ResolverError({
           message: 'Attach Source failure',
           error: err,
@@ -377,6 +386,7 @@ export async function digitalRiverUpdateCheckout(
       }
     }
   }
+
   try {
     updateCheckoutResponse = await digitalRiver.updateCheckoutWithSource({
       settings,
@@ -418,31 +428,36 @@ export async function countryCode(ctx: Context, next: () => Promise<unknown>) {
   await next()
 }
 
-export async function digitalRiverGetSources(ctx: Context, next: () => Promise<unknown>) {
+export async function digitalRiverGetSources(
+  ctx: Context,
+  next: () => Promise<unknown>
+) {
   const {
     clients: { apps, digitalRiver },
     vtex: { logger },
   } = ctx
-  
+
   const app: string = getAppId()
   const settings = await apps.getAppSettings(app)
 
-  const sessionData : SessionFields = await getSession(ctx)
+  const sessionData: SessionFields = await getSession(ctx)
 
-  const profileData = sessionData.impersonate && sessionData.impersonate.profile ? sessionData.impersonate.profile : sessionData.profile
+  const profileData = sessionData.impersonate?.profile
+    ? sessionData.impersonate.profile
+    : sessionData.profile
 
-  let customerId = profileData && profileData.id
-  let customer;
+  const customerId = profileData?.id
+  let customer
+
   if (customerId) {
     try {
-      customer = await digitalRiver.getCustomerById({ settings, customerId});
+      customer = await digitalRiver.getCustomerById({ settings, customerId })
     } catch (err) {
       logger.error({
         error: err,
         message: 'DigitalRiverGetSources-getCustomerById',
       })
-      
-  
+
       throw new ResolverError({
         message: 'Get Customer failure',
         error: err,

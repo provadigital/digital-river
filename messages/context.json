@@ -11,6 +11,8 @@
   "admin/digital-river.settings.vtexAppToken.helpText": "admin/digital-river.settings.vtexAppToken.helpText",
   "admin/digital-river.settings.isLive.label": "admin/digital-river.settings.isLive.label",
   "admin/digital-river.settings.isLive.helpText": "admin/digital-river.settings.isLive.helpText",
+  "admin/digital-river.settings.isAutomaticSync.label": "admin/digital-river.settings.isAutomaticSync.label",
+  "admin/digital-river.settings.isAutomaticSync.helpText": "admin/digital-river.settings.isAutomaticSync.helpText",
   "admin/digital-river.settings.enableTaxCalculation.label": "admin/digital-river.settings.enableTaxCalculation.label",
   "admin/digital-river.settings.enableTaxCalculation.helpText": "admin/digital-river.settings.enableTaxCalculation.helpText",
   "admin/digital-river.taxStatus.otherTaxConfiguration": "admin/digital-river.taxStatus.otherTaxConfiguration",

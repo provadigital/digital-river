@@ -12,10 +12,11 @@ export async function getSession(context: Context) {
 
   const sessionCookie = cookies.get(VTEX_SESSION)
 
-  if (sessionCookie === undefined)
+  if (sessionCookie === undefined) {
     throw new ResolverError(
       `Invalid request for session, the ${VTEX_SESSION} wasn't provided!`
     )
+  }
 
   const { sessionData } = await customSession.getSession(sessionCookie, ['*'])
 

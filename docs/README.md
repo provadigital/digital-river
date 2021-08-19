@@ -33,7 +33,7 @@ const digitalRiverPaymentGroupClass = '.DigitalRiverPaymentGroup'
 const digitalRiverPaymentGroupButtonID =
   'payment-group-DigitalRiverPaymentGroup'
 
-const digitalRiverPublicKey = 'pk_test_67bcac8015da4adb97d4671d7a43c7f2' // NOTE! Enter your Digital River public API key here
+const digitalRiverPublicKey = 'pk_test_1234567890' // NOTE! Enter your Digital River public API key here
 
 const paymentErrorTitle = 'Unable to check out with selected payment method.'
 const paymentErrorDescription =
