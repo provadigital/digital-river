@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { IncomingHttpHeaders } from 'http2'
 
 // import convertIso3To2 from 'country-iso-3-to-2'

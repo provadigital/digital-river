@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { InstanceOptions, IOContext } from '@vtex/api'
 import { JanusClient } from '@vtex/api'
 
@@ -19,41 +20,57 @@ export default class CatalogClient extends JanusClient {
     this.http.get(this.routes.specifications(), {
       metric: 'catalogClient-getSpecifications',
     })
-  
-  public createSpecification = (name: string) =>
-    this.http.post(this.routes.createSpecification(), {
-      CategoryId: null,
-      Name: name
-    },{
-      metric: 'catalogClient-createSpecification',
-    })
 
-  public createSpecificationField = (fieldGroupId: number, name: string, fieldTypeId: number) : Promise<any> =>
-    this.http.post(this.routes.createSpecificationField(), {
-      CategoryId: null,
-      FieldGroupId: fieldGroupId,
-      Name: name,
-      IsFilter: false,
-      IsRequired: false,
-      IsOnProductDetails: false,
-      IsStockKeepingUnit: false,
-      IsActive: true,
-      IsTopMenuLinkActive: false,
-      IsSideMenuLinkActive: false,
-      FieldTypeId: fieldTypeId
-    },{
-      metric: 'catalogClient-createSpecificationField',
-    })
-  
+  public createSpecification = (name: string) =>
+    this.http.post(
+      this.routes.createSpecification(),
+      {
+        CategoryId: null,
+        Name: name,
+      },
+      {
+        metric: 'catalogClient-createSpecification',
+      }
+    )
+
+  public createSpecificationField = (
+    fieldGroupId: number,
+    name: string,
+    fieldTypeId: number
+  ): Promise<any> =>
+    this.http.post(
+      this.routes.createSpecificationField(),
+      {
+        CategoryId: null,
+        FieldGroupId: fieldGroupId,
+        Name: name,
+        IsFilter: false,
+        IsRequired: false,
+        IsOnProductDetails: false,
+        IsStockKeepingUnit: false,
+        IsActive: true,
+        IsTopMenuLinkActive: false,
+        IsSideMenuLinkActive: false,
+        FieldTypeId: fieldTypeId,
+      },
+      {
+        metric: 'catalogClient-createSpecificationField',
+      }
+    )
+
   public createSpecificationValue = (fieldId: number, name: string) =>
-    this.http.post(this.routes.createSpecificationValue(), {
-      FieldId: fieldId,
-      Name: name,
-      IsActive: true
-    },{
-      metric: 'catalogClient-createSpecificationValue',
-    })
-  
+    this.http.post(
+      this.routes.createSpecificationValue(),
+      {
+        FieldId: fieldId,
+        Name: name,
+        IsActive: true,
+      },
+      {
+        metric: 'catalogClient-createSpecificationValue',
+      }
+    )
+
   public getSkus = (page: number, pageSize: number) =>
     this.http.get(this.routes.skus(page, pageSize), {
       metric: 'catalogClient-getSkus',
@@ -68,7 +85,7 @@ export default class CatalogClient extends JanusClient {
     this.http.get(this.routes.productById(productId), {
       metric: 'catalogClient-getProductById',
     })
-  
+
   public getProductSpecifications = (productId: number) =>
     this.http.get(this.routes.productSpecifications(productId), {
       metric: 'catalogClient-getProductSpecifications',
@@ -78,7 +95,7 @@ export default class CatalogClient extends JanusClient {
     return {
       root: () => '/api',
       specifications: () =>
-        `${this.routes.root()}/catalog_system/pvt/specification/groupbycategory/1`,
+        `${this.routes.root()}/catalog_system/pvt/specification/groupbycategory/0`,
       createSpecification: () =>
         `${this.routes.root()}/catalog_system/pvt/specification/group`,
       createSpecificationField: () =>

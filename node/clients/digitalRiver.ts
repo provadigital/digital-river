@@ -12,7 +12,7 @@ export default class DigitalRiver extends ExternalClient {
   // getCustomerById
   public async getCustomerById({
     settings,
-    customerId
+    customerId,
   }: {
     settings: AppSettings
     customerId: string
@@ -45,18 +45,22 @@ export default class DigitalRiver extends ExternalClient {
   public async attachSourceCustomer({
     settings,
     customerId,
-    sourceId
+    sourceId,
   }: {
     settings: AppSettings
-    customerId: string,
+    customerId: string
     sourceId: string
   }): Promise<DRCustomerResponse> {
-    return this.http.post(`/customers/${customerId}/sources/${sourceId}`, {},{
-      headers: {
-        Authorization: `Bearer ${settings.digitalRiverToken}`,
-        'Content-Type': `application/json`,
-      },
-    })
+    return this.http.post(
+      `/customers/${customerId}/sources/${sourceId}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${settings.digitalRiverToken}`,
+          'Content-Type': `application/json`,
+        },
+      }
+    )
   }
 
   // createCheckout
@@ -266,5 +270,4 @@ export default class DigitalRiver extends ExternalClient {
       },
     })
   }
-  
 }

@@ -1,5 +1,6 @@
 interface AppSettings {
   digitalRiverToken: string
+  isAutomaticSync: boolean
 }
 interface Authentication {
   username: string

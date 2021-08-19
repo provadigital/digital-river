@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { path, toLower } from 'ramda'
 
 interface ProfileFields {
@@ -30,7 +31,7 @@ const profileFields = (
   user: SessionImpersonate | SessionAuthentication
 ): ProfileFields => ({
   email:
-    path(['email', 'value'], profile) ||
+    path(['email', 'value'], profile) ??
     path(['storeUserEmail', 'value'], user),
   firstName: path(['firstName', 'value'], profile),
   id: path(['id', 'value'], profile),
@@ -44,20 +45,21 @@ const setProfileData = (
   profile: SessionProfile,
   user: SessionImpersonate | SessionAuthentication
 ) => {
-    if (path(['storeUserId', 'value'], user)) {
-        return {
-            profile: {
-                ...profileFields(profile, user),
-              },
-        }
+  if (path(['storeUserId', 'value'], user)) {
+    return {
+      profile: {
+        ...profileFields(profile, user),
+      },
     }
-    return {}
+  }
+
+  return {}
 }
 
-
-
+// eslint-disable-next-line @typescript-eslint/ban-types
 export const sessionFields = (session: Session): SessionFields | {} => {
   const { namespaces } = session
+
   return namespaces
     ? {
         adminUserEmail: path(
