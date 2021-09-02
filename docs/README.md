@@ -27,7 +27,7 @@ This app integrates Digital River with VTEX checkout, allowing shoppers to inter
 4. Add the following JavaScript to your `checkout6-custom.js` file, which is typically edited by accessing the **Store Setup** section in your admin sidebar and clicking `Checkout`, then clicking the blue gear icon and then the `Code` tab:
 
 ```js
-// DIGITAL RIVER Version 0.0.22
+// DIGITAL RIVER Version 0.0.23
 let checkoutUpdated = false
 const digitalRiverPaymentGroupClass = '.DigitalRiverPaymentGroup'
 const digitalRiverPaymentGroupButtonID =
@@ -138,12 +138,12 @@ function loadStoredCards(checkoutId) {
       if (response.customer && response.customer.sources) {
         var sources = response.customer.sources;
         if (sources.length > 0) {
-          var radiosHtmls = '';
+          var radiosHtmls = '<div class="stored-credit-cards-title" style="margin-bottom: 16px;"><span class="DR-payment-method-name DR-payment-method-name-with-image" style="color: rgba(0,0,0,.75); font-size: 1rem; font-weight: 400; line-height: 20px; margin: 0px;">Saved Cards</span></div>';
           for (var i = 0; i < sources.length; i++) {
             radiosHtmls += '<input name="DR-stored-cards" type="radio" id="' + sources[i].id + '" value="' + sources[i].id + '">';
-            radiosHtmls += '<label style="display: inline-block; vertical-align: sub; margin-bottom: 8px; margin-left: 4px; font-size: 0.875rem" for="' + sources[i].id + '">' + sources[i].creditCard.brand + ' ending with ' + sources[i].creditCard.lastFourDigits + '</label></br>';
+            radiosHtmls += '<label style="display: inline-block; vertical-align: sub; margin-bottom: 8px; margin-left: 4px; font-size: 0.875rem" for="' + sources[i].id + '">' + sources[i].creditCard.brand + ' ending with ' + sources[i].creditCard.lastFourDigits + ' expires ' + ('0' + sources[i].creditCard.expirationMonth).slice(-2) + '/' + sources[i].creditCard.expirationYear + '</label></br>';
           }
-          radiosHtmls += '<div class="stored-credit-cards"><button id="submit-stored-creditCard" style="background-color: #1264a3; color: #FFF; height: 56px; border-radius: .25rem; text-align: center; border-top: none!important; border: none; font-weight: 400; padding: 1rem; width: 250px; margin-bottom: 24px;">USE CARD</button></div>';
+          radiosHtmls += '<div class="stored-credit-cards" style="margin-top: 16px;"><button id="submit-stored-creditCard" style="background-color: #1264a3; color: #FFF; height: 56px; border-radius: .25rem; text-align: center; border-top: none!important; border: none; font-weight: 400; padding: 1rem; width: 250px; margin-bottom: 24px;">BUY NOW WITH SAVED CARD</button></div>';
       
           $('#drop-in').prepend('<div class="DR-stored-cards">' + radiosHtmls + '</div>');
           $('#submit-stored-creditCard').click(function() {
