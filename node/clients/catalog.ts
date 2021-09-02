@@ -58,13 +58,18 @@ export default class CatalogClient extends JanusClient {
       }
     )
 
-  public createSpecificationValue = (fieldId: number, name: string) =>
+  public createSpecificationValue = (
+    fieldId: number,
+    name: string,
+    position: number
+  ) =>
     this.http.post(
       this.routes.createSpecificationValue(),
       {
         FieldId: fieldId,
         Name: name,
         IsActive: true,
+        Position: position,
       },
       {
         metric: 'catalogClient-createSpecificationValue',

@@ -7,6 +7,7 @@ declare module 'vtex.styleguide' {
   export const Dropdown
   export const Spinner
   export const Table
+  export const Checkbox
   export const Button
   export const ButtonPlain
   export const IconWarning

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import pThrottle from 'p-throttle'
+import type { EventContext } from '@vtex/api'
 import { ResolverError } from '@vtex/api'
 
 import {
@@ -10,14 +11,17 @@ import {
   SPECIFICATION_FIELD_COMBO,
   DATA_ENTITY,
   SCHEMA_NAME,
-  MONTHS,
 } from '../constants'
 
 const fields = ['_all']
 const pagination = {
   page: 1,
-  pageSize: 100,
+  pageSize: 10,
 }
+
+let sort = 'dateLog DESC'
+
+let where = ''
 
 const throttle = pThrottle({
   limit: 25,
@@ -58,9 +62,9 @@ export async function digitalRiverSetup(
         SPECIFICATION_FIELD_COMBO
       )
 
-      countries.forEach((country) =>
-        catalog.createSpecificationValue(field.Id, country)
-      )
+      for (let i = 0; i < countries.length; i++) {
+        catalog.createSpecificationValue(field.Id, countries[i], i + 1)
+      }
     }
   }
 
@@ -87,21 +91,40 @@ export async function digitalRiverCatalogLogs(
 ) {
   const {
     clients: { masterdata },
+    query,
   } = ctx
 
-  const data = await masterdata.searchDocuments({
+  if (query?.page && query?.pageSize) {
+    pagination.page = parseInt(query.page, 10)
+    pagination.pageSize = parseInt(query.pageSize, 10)
+  }
+
+  if (query?.sort) {
+    sort = query.sort
+  }
+
+  if (query?.where) {
+    where = query.where
+  }
+
+  const data = await masterdata.searchDocumentsWithPaginationInfo({
     dataEntity: DATA_ENTITY,
     fields,
     schema: SCHEMA_NAME,
     pagination,
+    sort,
+    where,
   })
 
   ctx.status = 200
-  ctx.body = { data }
+  ctx.body = { ...data }
   await next()
 }
 
-export async function digitalRiverSkuSync(ctx: Context) {
+export async function digitalRiverSkuSync(
+  ctx: EventContext<any>,
+  next: () => Promise<void>
+) {
   const {
     clients: { apps },
     body,
@@ -114,7 +137,7 @@ export async function digitalRiverSkuSync(ctx: Context) {
     createOrUpdateSku(ctx, settings, { skuId: body.IdSku, origin: 'trigger' })
   }
 
-  ctx.status = 200
+  await next()
 }
 
 const throttled = throttle(
@@ -160,7 +183,7 @@ export async function digitalRiverCatalogSync(
 }
 
 async function createOrUpdateSku(
-  ctx: Context,
+  ctx: EventContext<any> | Context,
   settings: AppSettings,
   skuSync: SkuSync
 ) {
@@ -256,14 +279,6 @@ async function createOrUpdateSku(
     countryOfOrigin: countryOfOrigin.split('-')[0].trim(),
   }
 
-  const d = new Date()
-  const dateNumber = `0${d.getDate()}`.slice(-2)
-  const hours = `0${d.getHours()}`.slice(-2)
-  const minutes = `0${d.getMinutes()}`.slice(-2)
-  const datestring = `${
-    MONTHS[d.getMonth()]
-  } ${dateNumber}, ${d.getFullYear()} ${hours}:${minutes}`
-
   const mdPayload = {
     productId: productId.toString(),
     productSku: skuSync.skuId.toString(),
@@ -271,7 +286,7 @@ async function createOrUpdateSku(
     responseData: '',
     origin: skuSync.origin,
     error: false,
-    dateLog: datestring,
+    dateLog: new Date().getTime().toString(),
   }
 
   if (eccn && countryOfOrigin && taxCode) {

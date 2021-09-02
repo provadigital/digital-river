@@ -1,6 +1,8 @@
+/* eslint-disable prefer-destructuring */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { FC } from 'react'
 import React, { useState, useEffect } from 'react'
+import { useQuery } from 'react-apollo'
 import { useIntl } from 'react-intl'
 import {
   Layout,
@@ -11,32 +13,57 @@ import {
   Button,
   Table,
   Spinner,
+  Checkbox,
 } from 'vtex.styleguide'
 
 import { jsonschema } from './constants'
+import AppSettings from './graphql/appSettings.graphql'
 
+// page size
 const tableLength = 10
+
 const CatalogLogs: FC = () => {
-  const { formatMessage } = useIntl()
+  const { formatMessage, formatDate, formatTime } = useIntl()
   const [page] = useState(1)
   const [appLoading, setAppLoading] = useState(false)
   const [syncLoading, setSyncLoading] = useState(false)
-  const [data, setData] = useState([])
+  const [filterStatements, setFilterStatements] = useState([])
+  const [dataSort, setDataSort] = useState({
+    sortOrder: 'DESC',
+    sortedBy: 'dateLog',
+  })
+
   const [tableInfo, setTableInfo] = useState({
-    slicedData: data.slice(0, tableLength),
+    data: [],
     currentPage: 1,
     currentItemFrom: 1,
     currentItemTo: tableLength,
-    itemsLength: data.length,
+    itemsLength: 0,
     emptyStateLabel: 'Nothing to show.',
   })
 
-  const [searchValue, setSearchValue] = useState('')
+  const { data: appData } = useQuery(AppSettings, {
+    variables: {
+      version: process.env.VTEX_APP_VERSION,
+    },
+    ssr: false,
+  })
 
-  const getData = async () => {
+  const parsedSettings =
+    appData?.appSettings?.message && JSON.parse(appData.appSettings.message)
+
+  const enableSyncCatalog = parsedSettings?.isAutomaticSync
+
+  const getData = async (
+    pageNumber: number,
+    { sortedBy, sortOrder }: any,
+    where: string
+  ) => {
     setAppLoading(true)
     const responseCatalog = await fetch(
-      `/_v/api/digital-river/catalog-logs?v=${new Date().getTime()}`
+      `/_v/api/digital-river/catalog-logs?v=${new Date().getTime()}&page=${pageNumber}&pageSize=${tableLength}${
+        where ? `&where=${where}` : ''
+      }&sort=${sortedBy} ${sortOrder}`
     )
       .then((response) => {
         return response.json()
@@ -45,17 +72,18 @@ const CatalogLogs: FC = () => {
         return json
       })
 
-    setData(responseCatalog.data)
-
     setTableInfo({
-      slicedData: responseCatalog.data.slice(0, tableLength),
-      currentPage: 1,
-      currentItemFrom: 1,
-      currentItemTo: tableLength,
-      itemsLength: responseCatalog.data.length,
+      data: responseCatalog.data,
+      currentPage: responseCatalog.pagination.page,
+      currentItemFrom:
+        (responseCatalog.pagination.page - 1) *
+          responseCatalog.pagination.pageSize +
+        1,
+      currentItemTo:
+        responseCatalog.pagination.page * responseCatalog.pagination.pageSize,
+      itemsLength: responseCatalog.pagination.total,
       emptyStateLabel: 'Nothing to show.',
     })
-    setSearchValue('')
     setAppLoading(false)
   }
 
@@ -74,96 +102,100 @@ const CatalogLogs: FC = () => {
     setSyncLoading(false)
   }
 
+  const getStatusFilter = (filters: any = []) => {
+    let isError = null
+
+    if (filters.length > 0) {
+      const filter: any = filters[0]
+      const filterObject = filter.object
+
+      isError =
+        filterObject.Error !== filterObject.Success ? filterObject.Error : ''
+    }
+
+    return isError !== null ? `error=${isError.toString()}` : 'error=true'
+  }
+
   const handleNextClick = () => {
     const currentPage = tableInfo.currentPage + 1
-    const currentItemFrom = tableInfo.currentItemTo + 1
-    const currentItemTo = tableLength * currentPage
-    const slicedData = data.slice(currentItemFrom - 1, currentItemTo)
+    const where = getStatusFilter(filterStatements)
 
-    setTableInfo({
-      slicedData,
-      currentPage,
-      currentItemFrom,
-      currentItemTo,
-      itemsLength: data.length,
-      emptyStateLabel: '',
-    })
+    getData(currentPage, dataSort, where)
   }
 
   const handlePrevClick = () => {
     if (tableInfo.currentPage === 0) return
     const currentPage = tableInfo.currentPage - 1
-    const currentItemFrom = tableInfo.currentItemFrom - tableLength
-    const currentItemTo = tableInfo.currentItemFrom - 1
-    const slicedData = data.slice(currentItemFrom - 1, currentItemTo)
+    const where = getStatusFilter(filterStatements)
 
-    setTableInfo({
-      slicedData,
-      currentPage,
-      currentItemFrom,
-      currentItemTo,
-      itemsLength: data.length,
-      emptyStateLabel: '',
+    getData(currentPage, dataSort, where)
+  }
+
+  const handleSort = ({ sortOrder, sortedBy }: any) => {
+    setDataSort({
+      sortOrder,
+      sortedBy,
     })
+    const where = getStatusFilter(filterStatements)
+
+    getData(1, { sortOrder, sortedBy }, where)
   }
 
-  const handleInputSearchChange = (e: any) => {
-    setSearchValue(e.target.value)
+  const handleFiltersChange = (statements = []) => {
+    setFilterStatements(statements)
+    const where = getStatusFilter(statements)
+
+    getData(1, dataSort, where)
   }
 
-  const handleInputSearchClear = () => {
-    setSearchValue('')
-  }
-
-  const handleInputSearchSubmit = (e: any) => {
-    const value = e?.target?.value
-    const regex = new RegExp(value, 'i')
-
-    if (!value) {
-      setTableInfo({
-        slicedData: data.slice(0, tableLength),
-        currentPage: 1,
-        currentItemFrom: 1,
-        currentItemTo: tableLength,
-        itemsLength: data.length,
-        emptyStateLabel: 'Nothing to show.',
-      })
-    } else {
-      const slicedData = data
-        .slice()
-        .filter(
-          (item: {
-            productId: string
-            productSku: string
-            requestData: string
-            responseData: string
-            origin: string
-            dateLog: string
-            error: boolean
-          }) =>
-            regex.test(item.productId) ||
-            regex.test(item.productSku) ||
-            regex.test(item.requestData) ||
-            regex.test(item.responseData) ||
-            regex.test(item.origin) ||
-            regex.test(item.dateLog) ||
-            regex.test(item.error ? 'Error' : 'Success')
-        )
-
-      setTableInfo({
-        slicedData: slicedData.slice(0, tableLength),
-        currentPage: 1,
-        currentItemFrom: 1,
-        currentItemTo: tableLength,
-        itemsLength: slicedData.length,
-        emptyStateLabel: 'Nothing to show.',
-      })
+  const statusSelectorObject = ({ value, onChange }: any) => {
+    const initialValue = {
+      Error: true,
+      Success: true,
+      ...(value || {}),
     }
+
+    const toggleValueByKey = (key: any) => {
+      const newValue = {
+        ...(value || initialValue),
+        [key]: value ? !value[key] : false,
+      }
+
+      return newValue
+    }
+
+    return (
+      <div>
+        {Object.keys(initialValue).map((opt, index) => {
+          return (
+            <div className="mb3" key={`class-statment-object-${opt}-${index}`}>
+              <Checkbox
+                checked={value ? value[opt] : initialValue[opt]}
+                label={opt}
+                name="default-checkbox-group"
+                onChange={() => {
+                  const newValue = toggleValueByKey(`${opt}`)
+                  const newValueKeys = Object.keys(newValue)
+                  const isEmptyFilter = !newValueKeys.some(
+                    (key) => !newValue[key]
+                  )
+
+                  onChange(isEmptyFilter ? null : newValue)
+                }}
+                value={opt}
+              />
+            </div>
+          )
+        })}
+      </div>
+    )
   }
 
   useEffect(() => {
-    getData()
-  }, [page])
+    const where = getStatusFilter(filterStatements)
+
+    getData(1, dataSort, where)
+  }, [dataSort, page])
 
   return (
     <ToastProvider positioning="window">
@@ -179,6 +211,7 @@ const CatalogLogs: FC = () => {
                 <span className="mr4">
                   <Button
                     variation="primary"
+                    disabled={!enableSyncCatalog}
                     onClick={() => handleSyncCatalog(showToast)}
                     isLoading={syncLoading}
                   >
@@ -193,7 +226,13 @@ const CatalogLogs: FC = () => {
                 <Button
                   variation="secondary"
                   size="small"
-                  onClick={() => getData()}
+                  onClick={() =>
+                    getData(
+                      tableInfo.currentPage,
+                      dataSort,
+                      getStatusFilter(filterStatements)
+                    )
+                  }
                   isLoading={syncLoading}
                 >
                   Reload
@@ -204,16 +243,60 @@ const CatalogLogs: FC = () => {
                   <Spinner />
                 ) : (
                   <Table
-                    schema={jsonschema}
-                    items={tableInfo.slicedData}
+                    schema={jsonschema(formatDate, formatTime)}
+                    items={tableInfo.data}
                     emptyStateLabel={tableInfo.emptyStateLabel}
-                    toolbar={{
-                      inputSearch: {
-                        value: searchValue,
-                        placeholder: 'Search...',
-                        onChange: handleInputSearchChange,
-                        onClear: handleInputSearchClear,
-                        onSubmit: handleInputSearchSubmit,
+                    filters={{
+                      alwaysVisibleFilters: ['error'],
+                      statements: filterStatements,
+                      onChangeStatements: handleFiltersChange,
+                      clearAllFiltersButtonLabel: 'Clear Filters',
+                      collapseLeft: true,
+                      options: {
+                        error: {
+                          label: 'Status',
+                          renderFilterLabel: (st: any) => {
+                            if (!st || !st.object) {
+                              return 'All'
+                            }
+
+                            const keys = st.object ? Object.keys(st.object) : []
+                            const isAllTrue = !keys.some(
+                              (key: string | number) => !st.object[key]
+                            )
+
+                            const isAllFalse = !keys.some(
+                              (key) => st.object[key]
+                            )
+
+                            const trueKeys = keys.filter(
+                              (key) => st.object[key]
+                            )
+
+                            let trueKeysLabel = ''
+
+                            trueKeys.forEach((key, index) => {
+                              trueKeysLabel += `${key}${
+                                index === trueKeys.length - 1 ? '' : ', '
+                              }`
+                            })
+
+                            return `${
+                              isAllTrue
+                                ? 'All'
+                                : isAllFalse
+                                ? 'None'
+                                : `${trueKeysLabel}`
+                            }`
+                          },
+                          verbs: [
+                            {
+                              label: 'Includes',
+                              value: 'includes',
+                              object: statusSelectorObject,
+                            },
+                          ],
+                        },
                       },
                     }}
                     pagination={{
@@ -224,6 +307,11 @@ const CatalogLogs: FC = () => {
                       textOf: 'of',
                       totalItems: tableInfo.itemsLength,
                     }}
+                    sort={{
+                      sortedBy: dataSort.sortedBy,
+                      sortOrder: dataSort.sortOrder,
+                    }}
+                    onSort={handleSort}
                     onRowClick={({ rowData }: { rowData: any }) => {
                       const w = window.open(
                         `/admin/Site/ProdutoForm.aspx?id=${rowData.productId}`,

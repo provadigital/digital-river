@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type {
   ClientsConfig,
   ServiceContext,
@@ -22,15 +23,15 @@ import {
   digitalRiverCreateCheckout,
   digitalRiverUpdateCheckout,
   countryCode,
-  digitalRiverGetSources
+  digitalRiverGetSources,
 } from './middlewares/checkout'
-
 import {
   digitalRiverSetup,
   digitalRiverCatalogSync,
   digitalRiverCatalogLogs,
-  digitalRiverSkuSync
+  digitalRiverSkuSync,
 } from './middlewares/digitalRiver'
+import { throttle } from './middlewares/throttle'
 
 const TIMEOUT_MS = 800
 
@@ -93,9 +94,7 @@ export default new Service<Clients, RecorderState, ParamsContext>({
     },
   },
   events: {
-    skuChange: (ctx: any) => {
-      digitalRiverSkuSync(ctx)
-    },
+    skuChange: [throttle, digitalRiverSkuSync],
   },
   routes: {
     ...implementsAPI<PaymentProviderProtocol<Context>>({

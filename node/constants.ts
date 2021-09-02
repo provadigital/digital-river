@@ -60,24 +60,10 @@ export const MOTOROLA_ACCOUNTS: { [key: string]: string } = {
   denpi: 'motoroladenpi',
 }
 
-export const MONTHS = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec',
-]
 export const DIGITAL_RIVER_GROUP_SPECS = 'Digital River'
 export const SPECIFICATION_FIELD_TEXT = 1
 export const SPECIFICATION_FIELD_COMBO = 5
-export const DATA_ENTITY = 'dr_catalog_logs'
+export const DATA_ENTITY = 'dr_catalog_synclogs'
 export const SCHEMA_NAME = 'v1'
 
 export const countries = [
@@ -360,21 +346,19 @@ export const schema = {
     'error',
     'productId',
     'productSku',
-    'status',
     'requestData',
     'responseData',
     'origin',
-    'addedQueue',
+    'dateLog',
   ],
   'v-default-fields': [
     'error',
     'productId',
     'productSku',
-    'status',
     'requestData',
     'responseData',
     'origin',
-    'addedQueue',
+    'dateLog',
   ],
   'v-cache': false,
   'v-security': {
@@ -383,31 +367,28 @@ export const schema = {
       'error',
       'productId',
       'productSku',
-      'status',
       'requestData',
       'responseData',
       'origin',
-      'addedQueue',
+      'dateLog',
     ],
     publicWrite: [
       'error',
       'productId',
       'productSku',
-      'status',
       'requestData',
       'responseData',
       'origin',
-      'addedQueue',
+      'dateLog',
     ],
     publicFilter: [
       'error',
       'productId',
       'productSku',
-      'status',
       'requestData',
       'responseData',
       'origin',
-      'addedQueue',
+      'dateLog',
     ],
   },
 }
