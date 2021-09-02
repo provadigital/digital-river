@@ -59,11 +59,11 @@ const CatalogLogs: FC = () => {
     { sortedBy, sortOrder }: any,
     where: string
   ) => {
+    const whereFilter = where ? `&where=${where}` : ''
+
     setAppLoading(true)
     const responseCatalog = await fetch(
-      `/_v/api/digital-river/catalog-logs?v=${new Date().getTime()}&page=${pageNumber}&pageSize=${tableLength}${
-        where ? `&where=${where}` : ''
-      }&sort=${sortedBy} ${sortOrder}`
+      `/_v/api/digital-river/catalog-logs?v=${new Date().getTime()}&page=${pageNumber}&pageSize=${tableLength}${whereFilter}&sort=${sortedBy} ${sortOrder}`
     )
       .then((response) => {
         return response.json()
@@ -110,10 +110,10 @@ const CatalogLogs: FC = () => {
       const filterObject = filter.object
 
       isError =
-        filterObject.Error !== filterObject.Success ? filterObject.Error : ''
+        filterObject.Error !== filterObject.Success ? filterObject.Error : null
     }
 
-    return isError !== null ? `error=${isError.toString()}` : 'error=true'
+    return isError !== null ? `error=${isError.toString()}` : ''
   }
 
   const handleNextClick = () => {
@@ -195,7 +195,7 @@ const CatalogLogs: FC = () => {
     const where = getStatusFilter(filterStatements)
 
     getData(1, dataSort, where)
-  }, [dataSort, page])
+  }, [dataSort, filterStatements, page])
 
   return (
     <ToastProvider positioning="window">
