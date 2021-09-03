@@ -1,7 +1,7 @@
 {
   "name": "connector-digital-river",
   "vendor": "vinneren",
-  "version": "0.0.22",
+  "version": "0.0.23",
   "title": "Digital River",
   "description": "Implementation of Digital River payment method, credit card processing, and tax calculation",
   "mustUpdateAt": "2018-01-04",
@@ -11,9 +11,7 @@
       "url": "https://help-tickets.vtex.com/en/support?app=vinneren.connector-digital-river"
     },
     "type": "free",
-    "availableCountries": [
-      "*"
-    ]
+    "availableCountries": ["*"]
   },
   "dependencies": {
     "vtex.styleguide": "9.x",
