@@ -18,7 +18,7 @@ This app integrates Digital River with VTEX checkout, allowing shoppers to inter
 
 ## Configuration
 
-1. Install this app in the desired account using the CLI command `vtex install vinneren.connector-digital-river`. If you have multiple accounts configured in a marketplace-seller relationship, install the app and repeat the following steps in each of the related accounts.
+1. Install this app in the desired account using the CLI command `vtex install vtexus.connector-digital-river`. If you have multiple accounts configured in a marketplace-seller relationship, install the app and repeat the following steps in each of the related accounts.
 2. In your admin sidebar, access the **Other** section and click on `Digital River`.
 3. In the settings fields, enter your `Digital River token`, `VTEX App Key` and `VTEX App Token`. For initial testing, use a test `Digital River token` and leave the `Enable production mode` toggle turned off.
 

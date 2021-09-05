@@ -130,7 +130,7 @@ const Admin: FC = () => {
           authorizationHeader: settingsState.digitalRiverToken,
           allowExecutionAfterErrors: false,
           integratedAuthentication: false,
-          appId: 'vinneren.connector-digital-river',
+          appId: 'vtexus.connector-digital-river',
         }
         updateOrderForm = true
       }
@@ -140,7 +140,7 @@ const Admin: FC = () => {
       if (
         !settingsState.enableTaxCalculation &&
         orderFormData?.orderFormConfiguration?.taxConfiguration?.appId ===
-          'vinneren.connector-digital-river'
+          'vtexus.connector-digital-river'
       ) {
         orderFormData.orderFormConfiguration.taxConfiguration = {}
         updateOrderForm = true
