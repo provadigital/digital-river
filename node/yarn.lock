@@ -1794,6 +1794,11 @@ bl@^3.0.0:
   dependencies:
     readable-stream "^3.0.1"
 
+bluebird@2.9.24:
+  version "2.9.24"
+  resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-2.9.24.tgz#14a2e75f0548323dc35aa440d92007ca154e967c"
+  integrity sha1-FKLnXwVIMj3DWqRA2SAHyhVOlnw=
+
 bluebird@^3.5.4, bluebird@^3.7.2:
   version "3.7.2"
   resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-3.7.2.tgz#9f229c15be272454ffa973ace0dbee79a1b0c36f"
@@ -5273,7 +5278,7 @@ static-extend@^0.1.1:
     define-property "^0.2.5"
     object-copy "^0.1.0"
 
-"stats-lite@github:vtex/node-stats-lite#dist":
+stats-lite@vtex/node-stats-lite#dist:
   version "2.2.0"
   resolved "https://codeload.github.com/vtex/node-stats-lite/tar.gz/1b0d39cc41ef7aaecfd541191f877887a2044797"
   dependencies:
@@ -5772,6 +5777,10 @@ verror@1.10.0:
 "vtex.styleguide@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.styleguide@9.135.0/public/@types/vtex.styleguide":
   version "9.135.0"
   resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.styleguide@9.135.0/public/@types/vtex.styleguide#3884521971a1c0f9b3773231b135e1e4abf9020f"
+
+"vtexus.connector-digital-river@http://vtexus.vtexassets.com/_v/public/typings/v1/vtexus.connector-digital-river@0.0.1-beta.1/public/@types/vtexus.connector-digital-river":
+  version "0.0.1-beta.1"
+  resolved "http://vtexus.vtexassets.com/_v/public/typings/v1/vtexus.connector-digital-river@0.0.1-beta.1/public/@types/vtexus.connector-digital-river#21a6783e1440c8328151341845e4e0b4d2a9b953"
 
 w3c-hr-time@^1.0.1:
   version "1.0.1"
