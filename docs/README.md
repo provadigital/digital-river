@@ -12,30 +12,26 @@
 
 This app integrates Digital River with VTEX checkout, allowing shoppers to interact with Digital River's 'Drop-In' component and select from a variety of payment methods all processed through a single Digital River account.
 
-> ⚠️ _This app is under development. For this initial version, orders are sent to Digital River as tax inclusive. Future versions of this app will support integration of Digital River as a tax calculation provider, will support adding / editing credit cards under my account_
+> ⚠️ _This app is under development. For this initial version, orders are sent to Digital River as tax inclusive. Future versions of this app will support integration of Digital River as a tax calculation provider._
 
-> ⚠️ _You must have a Digital River account, and all SKUs must be registered with Digital River. If a shopper attempts to check out with an unregistered SKU, the Digital River 'Drop-In' component will fail to load._
+> ⚠️ _You must have a Digital River account, and all SKUs must be registered with Digital River. This can be done by utilizing this app's catalog sync feature or through Digital River's API. If a shopper attempts to check out with an unregistered SKU, the Digital River 'Drop-In' component will fail to load._
 
 ## Configuration
 
 1. Install this app in the desired account using the CLI command `vtex install vtexus.connector-digital-river`. If you have multiple accounts configured in a marketplace-seller relationship, install the app and repeat the following steps in each of the related accounts.
-2. In your admin sidebar, access the **Other** section and click on `Digital River` then click on `Configuration`.
-3. In the settings fields, enter your `Digital River token`, `VTEX App Key` and `VTEX App Token`. For initial testing, use a test `Digital River token` and leave the `Enable production mode` toggle turned off. Turn on the `Enable automatic catalog sync` toggle to enable sync of skus from VTEX to Digital River skus everytime a sku is added or update in VTEX catalog. 
+2. In your admin sidebar, access the **Other** section and click on `Digital River` and then on `Configuration`.
+3. In the settings fields, enter your `Digital River token`, `VTEX App Key` and `VTEX App Token`. For initial testing, use a test `Digital River token` and leave the `Enable production mode` toggle turned off. Turn on the `Enable automatic catalog sync` toggle to enable syncing of SKUs from VTEX to Digital River each time a SKU is added or updated in your VTEX catalog.
 
 ⚠️ _For multiple accounts configured in a marketplace-seller relationship, the same `VTEX App Key` and `VTEX App Token` should be used for all of the accounts in which the app is installed. You can use any of the accounts to generate the key/token, and then grant additional permissions to the key/token by [creating a new user](https://help.vtex.com/en/tutorial/managing-users--tutorials_512) on each of the other accounts using the `VTEX App Key` in place of the user's email address, and then assigning the Owner role to that user._
 
-4. Is recommended to do an initial full catalog sync between VTEX to Digital River. To do this access the **Other** section and click on `Digital River` then click on `Catalog Sync Logs` and click on the button `SYNC CATALOG`. This will get all the skus from VTEX catalog and will be sent to Digital River's catalog.
+4. Is recommended to do an initial full catalog sync between VTEX and Digital River. To do this access the **Other** section, click on `Digital River` and then click on `Catalog Sync Logs`. On this page, click on the button `SYNC CATALOG`. This will send all current SKUs from your VTEX catalog to Digital River. Note that the `Enable automatic catalog sync` setting must have been enabled in step 3 above.
 
-Important to consider is that `Tax Code, ECCN, Country of origin` fields of products should have a valid value for a sku to be qualified to be sent to Digital River.
-
-In this page you will be able to see a log of every intent to send the sku from VTEX to Digital River. Since this process runs in the background there is a `RELOAD` button to refresh the logs and see updated logs.
-
-These logs will show if a sku was success or had an error on being sent to Digital River.
+⚠️ _Note that each product must have valid values for `Tax Code`, `ECCN`, and `Country of origin` in the VTEX catalog to be eligible to be sent to Digital River. The logs on this page will show whether each SKU was processed successfully or encountered an error due to missing information. Since this process runs in the background there is a `RELOAD` button to refresh the logs._
 
 5. Add the following JavaScript to your `checkout6-custom.js` file, which is typically edited by accessing the **Store Setup** section in your admin sidebar and clicking `Checkout`, then clicking the blue gear icon and then the `Code` tab:
 
 ```js
-// DIGITAL RIVER Version 0.1.0
+// DIGITAL RIVER Version 1.0.0
 let checkoutUpdated = false
 const digitalRiverPaymentGroupClass = '.DigitalRiverPaymentGroup'
 const digitalRiverPaymentGroupButtonID =
@@ -144,25 +140,49 @@ function loadStoredCards(checkoutId) {
     })
     .then(async (response) => {
       if (response.customer && response.customer.sources) {
-        var sources = response.customer.sources;
+        var sources = response.customer.sources
         if (sources.length > 0) {
-          var radiosHtmls = '<div class="stored-credit-cards-title" style="margin-bottom: 16px;"><span class="DR-payment-method-name DR-payment-method-name-with-image" style="color: rgba(0,0,0,.75); font-size: 1rem; font-weight: 400; line-height: 20px; margin: 0px;">Saved Cards</span></div>';
+          var radiosHtmls =
+            '<div class="stored-credit-cards-title" style="margin-bottom: 16px;"><span class="DR-payment-method-name DR-payment-method-name-with-image" style="color: rgba(0,0,0,.75); font-size: 1rem; font-weight: 400; line-height: 20px; margin: 0px;">Saved Cards</span></div>'
           for (var i = 0; i < sources.length; i++) {
-            radiosHtmls += '<input name="DR-stored-cards" type="radio" id="' + sources[i].id + '" value="' + sources[i].id + '">';
-            radiosHtmls += '<label style="display: inline-block; vertical-align: sub; margin-bottom: 8px; margin-left: 4px; font-size: 0.875rem" for="' + sources[i].id + '">' + sources[i].creditCard.brand + ' ending with ' + sources[i].creditCard.lastFourDigits + ' expires ' + ('0' + sources[i].creditCard.expirationMonth).slice(-2) + '/' + sources[i].creditCard.expirationYear + '</label></br>';
+            radiosHtmls +=
+              '<input name="DR-stored-cards" type="radio" id="' +
+              sources[i].id +
+              '" value="' +
+              sources[i].id +
+              '">'
+            radiosHtmls +=
+              '<label style="display: inline-block; vertical-align: sub; margin-bottom: 8px; margin-left: 4px; font-size: 0.875rem" for="' +
+              sources[i].id +
+              '">' +
+              sources[i].creditCard.brand +
+              ' ending with ' +
+              sources[i].creditCard.lastFourDigits +
+              ' expires ' +
+              ('0' + sources[i].creditCard.expirationMonth).slice(-2) +
+              '/' +
+              sources[i].creditCard.expirationYear +
+              '</label></br>'
           }
-          radiosHtmls += '<div class="stored-credit-cards" style="margin-top: 16px;"><button id="submit-stored-creditCard" style="background-color: #1264a3; color: #FFF; height: 56px; border-radius: .25rem; text-align: center; border-top: none!important; border: none; font-weight: 400; padding: 1rem; width: 250px; margin-bottom: 24px;">BUY NOW WITH SAVED CARD</button></div>';
-      
-          $('#drop-in').prepend('<div class="DR-stored-cards">' + radiosHtmls + '</div>');
-          $('#submit-stored-creditCard').click(function() {
-            var sourceId = $('input[name=DR-stored-cards]:checked').attr('id');
+          radiosHtmls +=
+            '<div class="stored-credit-cards" style="margin-top: 16px;"><button id="submit-stored-creditCard" style="background-color: #1264a3; color: #FFF; height: 56px; border-radius: .25rem; text-align: center; border-top: none!important; border: none; font-weight: 400; padding: 1rem; width: 250px; margin-bottom: 24px;">BUY NOW WITH SAVED CARD</button></div>'
+
+          $('#drop-in').prepend(
+            '<div class="DR-stored-cards">' + radiosHtmls + '</div>'
+          )
+          $('#submit-stored-creditCard').click(function () {
+            var sourceId = $('input[name=DR-stored-cards]:checked').attr('id')
             fetch(
               `${
                 __RUNTIME__.rootPath || ``
               }/_v/api/digital-river/checkout/update`,
               {
                 method: 'POST',
-                body: JSON.stringify({ checkoutId, sourceId, readyForStorage: false }),
+                body: JSON.stringify({
+                  checkoutId,
+                  sourceId,
+                  readyForStorage: false,
+                }),
               }
             )
               .then((rawResponse) => {
@@ -171,15 +191,12 @@ function loadStoredCards(checkoutId) {
               .then(() => {
                 checkoutUpdated = true
                 clickBuyNowButton()
-              });
+              })
           })
-          $('#' + sources[0].id).click();
+          $('#' + sources[0].id).click()
         }
       }
-    });
-  
-  
-  
+    })
 }
 
 async function initDigitalRiver(orderForm) {
@@ -264,14 +281,17 @@ async function initDigitalRiver(orderForm) {
           },
         },
         onSuccess(data) {
-
           fetch(
             `${
               __RUNTIME__.rootPath || ``
             }/_v/api/digital-river/checkout/update`,
             {
               method: 'POST',
-              body: JSON.stringify({ checkoutId, sourceId: data.source.id, readyForStorage: data.readyForStorage }),
+              body: JSON.stringify({
+                checkoutId,
+                sourceId: data.source.id,
+                readyForStorage: data.readyForStorage,
+              }),
             }
           )
             .then((rawResponse) => {
@@ -288,7 +308,7 @@ async function initDigitalRiver(orderForm) {
           renderErrorMessage(paymentErrorTitle, paymentErrorDescription, true)
         },
         onReady(data) {
-          loadStoredCards(checkoutId);
+          loadStoredCards(checkoutId)
         },
       }
 
@@ -334,7 +354,6 @@ $(window).on('orderFormUpdated.vtex', function (evt, orderForm) {
     }
   }
 })
-
 ```
 
 6. In your admin sidebar, access the **Transactions** section and click `Payments > Settings`.

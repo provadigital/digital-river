@@ -7,9 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
-## [0.1.0] - 2021-09-15
-
 ### Added
+
 - Added submenu for configuration keys and catalog sync logs
 - Added digital river key input type as password
 - Added call service to add initial setup, it creates MD table for catalog sync logs and required specs at a product level (ECCN, Country of origin)
