@@ -12,7 +12,7 @@
   "admin/digital-river.settings.isLive.label": "Enable production mode",
   "admin/digital-river.settings.isLive.helpText": "Disable to use test mode, enable for production mode; make sure to use the appropriate token for the selected mode.",
   "admin/digital-river.settings.isAutomaticSync.label": "Enable automatic catalog sync",
-  "admin/digital-river.settings.isAutomaticSync.helpText": "Enable for automatic catalog sync mode to trigger sku sync to Digital River everytime there is an update in VTEX sku.",
+  "admin/digital-river.settings.isAutomaticSync.helpText": "Enable automatic syncing of VTEX catalog changes to Digital River's system.",
   "admin/digital-river.settings.enableTaxCalculation.label": "Enable tax calculation",
   "admin/digital-river.settings.enableTaxCalculation.helpText": "Activate Digital River in checkout as your tax calculator. WARNING: Make sure to test checkout after changing this setting.",
   "admin/digital-river.taxStatus.otherTaxConfiguration": "(Disabled because another tax provider is already configured)",
