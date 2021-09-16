@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.1.0] - 2021-09-15
+
+### Added
+- Added submenu for configuration keys and catalog sync logs
+- Added digital river key input type as password
+- Added call service to add initial setup, it creates MD table for catalog sync logs and required specs at a product level (ECCN, Country of origin)
+- Added configuration toggle for enable/disable full catalog sync
+- Catalog sync logs is showed in a pagination table and can filter by status(error/success), order by product id, sku, executed
+- Added service that adds specs product level (ECCN, Country of origin) and MD table
+- Added service to sync full catalog to DR catalog
+- Added trigger event to sync sku every time there is a sku change
+- Added in checkout custom js support for saving profile
+- Added in checkout custom js support for saving credit cards
+- Added in checkout custom js support for use stored credit cards
+- Added in checkout custom js support for compliance
+- Added in checkout custom js support for terms and conditions
+
 ## [0.0.22] - 2021-04-19
 
 ### Fixed

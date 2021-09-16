@@ -12,19 +12,27 @@
 
 This app integrates Digital River with VTEX checkout, allowing shoppers to interact with Digital River's 'Drop-In' component and select from a variety of payment methods all processed through a single Digital River account.
 
-> ⚠️ _This app is under development. For this initial version, orders are sent to Digital River as tax inclusive. Future versions of this app will support integration of Digital River as a tax calculation provider._
+> ⚠️ _This app is under development. For this initial version, orders are sent to Digital River as tax inclusive. Future versions of this app will support integration of Digital River as a tax calculation provider, will support adding / editing credit cards under my account_
 
-> ⚠️ _You must have a Digital River account, and all SKUs must be registered with Digital River. If a shopper attempts to check out with an unregistered SKU, the Digital River 'Drop-In' component will fail to load. Future versions of this app will include a catalog sync feature to automatically register SKUs with Digital River, but for now they must be registered manually using [Digital River's API](https://www.digitalriver.com/docs/digital-river-api-reference/#operation/createSkus)._
+> ⚠️ _You must have a Digital River account, and all SKUs must be registered with Digital River. If a shopper attempts to check out with an unregistered SKU, the Digital River 'Drop-In' component will fail to load._
 
 ## Configuration
 
 1. Install this app in the desired account using the CLI command `vtex install vtexus.connector-digital-river`. If you have multiple accounts configured in a marketplace-seller relationship, install the app and repeat the following steps in each of the related accounts.
-2. In your admin sidebar, access the **Other** section and click on `Digital River`.
-3. In the settings fields, enter your `Digital River token`, `VTEX App Key` and `VTEX App Token`. For initial testing, use a test `Digital River token` and leave the `Enable production mode` toggle turned off.
+2. In your admin sidebar, access the **Other** section and click on `Digital River` then click on `Configuration`.
+3. In the settings fields, enter your `Digital River token`, `VTEX App Key` and `VTEX App Token`. For initial testing, use a test `Digital River token` and leave the `Enable production mode` toggle turned off. Turn on the `Enable automatic catalog sync` toggle to enable sync of skus from VTEX to Digital River skus everytime a sku is added or update in VTEX catalog. 
 
 ⚠️ _For multiple accounts configured in a marketplace-seller relationship, the same `VTEX App Key` and `VTEX App Token` should be used for all of the accounts in which the app is installed. You can use any of the accounts to generate the key/token, and then grant additional permissions to the key/token by [creating a new user](https://help.vtex.com/en/tutorial/managing-users--tutorials_512) on each of the other accounts using the `VTEX App Key` in place of the user's email address, and then assigning the Owner role to that user._
 
-4. Add the following JavaScript to your `checkout6-custom.js` file, which is typically edited by accessing the **Store Setup** section in your admin sidebar and clicking `Checkout`, then clicking the blue gear icon and then the `Code` tab:
+4. Is recommended to do an initial full catalog sync between VTEX to Digital River. To do this access the **Other** section and click on `Digital River` then click on `Catalog Sync Logs` and click on the button `SYNC CATALOG`. This will get all the skus from VTEX catalog and will be sent to Digital River's catalog.
+
+Important to consider is that `Tax Code, ECCN, Country of origin` fields of products should have a valid value for a sku to be qualified to be sent to Digital River.
+
+In this page you will be able to see a log of every intent to send the sku from VTEX to Digital River. Since this process runs in the background there is a `RELOAD` button to refresh the logs and see updated logs.
+
+These logs will show if a sku was success or had an error on being sent to Digital River.
+
+5. Add the following JavaScript to your `checkout6-custom.js` file, which is typically edited by accessing the **Store Setup** section in your admin sidebar and clicking `Checkout`, then clicking the blue gear icon and then the `Code` tab:
 
 ```js
 // DIGITAL RIVER Version 0.1.0
@@ -329,14 +337,14 @@ $(window).on('orderFormUpdated.vtex', function (evt, orderForm) {
 
 ```
 
-5. In your admin sidebar, access the **Transactions** section and click `Payments > Settings`.
-6. Click the `Gateway Affiliations` tab and click the green plus sign to add a new affiliation.
-7. Click `DigitalRiverV2` from the **Others** list.
-8. Modify the `Affiliation name` if desired, choose an `Auto Settlement` behavior from the dropdown (Digital River recommends setting this to "Disabled: Do Not Auto Settle") and then click `Save`. Leave `Application Key` and `Application Token` blank.
-9. Click the `Payment Conditions` tab and click the green plus sign to add a new payment condition.
-10. Click `DigitalRiver` from the **Other** list.
-11. In the `Process with affiliation` dropdown, choose the name of the affiliation that you created in step 8. Set the status to `Active` and click `Save`. Note that this will activate the payment method in checkout!
-12. After successfully testing the payment method in test mode, return to the Digital River app settings page from step 2. Replace your test `Digital River token` with a production token and turn on the `Enable Production mode` toggle. Save the settings and your checkout page will be all set to start accepting production orders.
+6. In your admin sidebar, access the **Transactions** section and click `Payments > Settings`.
+7. Click the `Gateway Affiliations` tab and click the green plus sign to add a new affiliation.
+8. Click `DigitalRiverV2` from the **Others** list.
+9. Modify the `Affiliation name` if desired, choose an `Auto Settlement` behavior from the dropdown (Digital River recommends setting this to "Disabled: Do Not Auto Settle") and then click `Save`. Leave `Application Key` and `Application Token` blank.
+10. Click the `Payment Conditions` tab and click the green plus sign to add a new payment condition.
+11. Click `DigitalRiver` from the **Other** list.
+12. In the `Process with affiliation` dropdown, choose the name of the affiliation that you created in step 8. Set the status to `Active` and click `Save`. Note that this will activate the payment method in checkout!
+13. After successfully testing the payment method in test mode, return to the Digital River app settings page from step 2. Replace your test `Digital River token` with a production token and turn on the `Enable Production mode` toggle. Save the settings and your checkout page will be all set to start accepting production orders.
 
 <!-- DOCS-IGNORE:start -->
 
