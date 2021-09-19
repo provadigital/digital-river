@@ -2,45 +2,71 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Tag } from 'vtex.styleguide'
 
-export const jsonschema = (formatDate: any, formatTime: any) => {
+export const jsonschema = (
+  formatDate: any,
+  formatTime: any,
+  formatMessage: any
+) => {
   return {
     properties: {
       error: {
-        title: 'Status',
+        title: formatMessage({
+          id: 'admin/digital-river.catalogLogs.table.status',
+        }),
         width: 100,
         // eslint-disable-next-line react/display-name
         cellRenderer: ({ cellData }: { cellData: any }) => {
           return (
             <Tag bgColor={cellData ? '#ff4c4c' : '#8bc34a'} color="#FFFFFF">
-              <span className="nowrap">{cellData ? 'Error' : 'Success'}</span>
+              <span className="nowrap">
+                {cellData
+                  ? formatMessage({
+                      id: 'admin/digital-river.catalogLogs.table.error',
+                    })
+                  : formatMessage({
+                      id: 'admin/digital-river.catalogLogs.table.success',
+                    })}
+              </span>
             </Tag>
           )
         },
       },
       productId: {
-        title: 'Product Id',
+        title: formatMessage({
+          id: 'admin/digital-river.catalogLogs.table.productId',
+        }),
         width: 180,
         sortable: true,
       },
       productSku: {
-        title: 'Product SKU',
+        title: formatMessage({
+          id: 'admin/digital-river.catalogLogs.table.productSku',
+        }),
         width: 180,
         sortable: true,
       },
       requestData: {
-        title: 'Request Data',
+        title: formatMessage({
+          id: 'admin/digital-river.catalogLogs.table.requestData',
+        }),
         width: 500,
       },
       responseData: {
-        title: 'Response Data',
+        title: formatMessage({
+          id: 'admin/digital-river.catalogLogs.table.responseData',
+        }),
         width: 500,
       },
       origin: {
-        title: 'Source',
+        title: formatMessage({
+          id: 'admin/digital-river.catalogLogs.table.source',
+        }),
         width: 100,
       },
       dateLog: {
-        title: 'Executed',
+        title: formatMessage({
+          id: 'admin/digital-river.catalogLogs.table.executed',
+        }),
         width: 250,
         sortable: true,
         cellRenderer: ({ cellData }: { cellData: any }) => {

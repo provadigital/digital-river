@@ -18,5 +18,21 @@
   "admin/digital-river.taxStatus.otherTaxConfiguration": "admin/digital-river.taxStatus.otherTaxConfiguration",
   "admin/digital-river.saveSettings.buttonText": "admin/digital-river.saveSettings.buttonText",
   "admin/digital-river.saveSettings.success": "admin/digital-river.saveSettings.success",
-  "admin/digital-river.saveSettings.failure": "admin/digital-river.saveSettings.failure"
+  "admin/digital-river.saveSettings.failure": "admin/digital-river.saveSettings.failure",
+  "admin/digital-river.catalogLogs.button.syncCatalog": "admin/digital-river.catalogLogs.button.syncCatalog",
+  "admin/digital-river.catalogLogs.button.reload": "admin/digital-river.catalogLogs.button.reload",
+  "admin/digital-river.catalogLogs.filter.status": "admin/digital-river.catalogLogs.filter.status",
+  "admin/digital-river.catalogLogs.filter.all": "admin/digital-river.catalogLogs.filter.all",
+  "admin/digital-river.catalogLogs.filter.none": "admin/digital-river.catalogLogs.filter.none",
+  "admin/digital-river.catalogLogs.filter.includes": "admin/digital-river.catalogLogs.filter.includes",
+  "admin/digital-river.catalogLogs.table.status": "admin/digital-river.catalogLogs.table.status",
+  "admin/digital-river.catalogLogs.table.productId": "admin/digital-river.catalogLogs.table.productId",
+  "admin/digital-river.catalogLogs.table.productSku": "admin/digital-river.catalogLogs.table.productSku",
+  "admin/digital-river.catalogLogs.table.requestData": "admin/digital-river.catalogLogs.table.requestData",
+  "admin/digital-river.catalogLogs.table.responseData": "admin/digital-river.catalogLogs.table.responseData",
+  "admin/digital-river.catalogLogs.table.source": "admin/digital-river.catalogLogs.table.source",
+  "admin/digital-river.catalogLogs.table.executed": "admin/digital-river.catalogLogs.table.executed",
+  "admin/digital-river.catalogLogs.table.error": "admin/digital-river.catalogLogs.table.error",
+  "admin/digital-river.catalogLogs.table.success": "admin/digital-river.catalogLogs.table.success",
+  "admin/digital-river.catalogLogs.table.emptyLabel": "admin/digital-river.catalogLogs.table.emptyLabel"
 }

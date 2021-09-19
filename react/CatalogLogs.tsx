@@ -39,7 +39,9 @@ const CatalogLogs: FC = () => {
     currentItemFrom: 1,
     currentItemTo: tableLength,
     itemsLength: 0,
-    emptyStateLabel: 'Nothing to show.',
+    emptyStateLabel: formatMessage({
+      id: 'admin/digital-river.catalogLogs.table.emptyLabel',
+    }),
   })
 
   const { data: appData } = useQuery(AppSettings, {
@@ -82,7 +84,9 @@ const CatalogLogs: FC = () => {
       currentItemTo:
         responseCatalog.pagination.page * responseCatalog.pagination.pageSize,
       itemsLength: responseCatalog.pagination.total,
-      emptyStateLabel: 'Nothing to show.',
+      emptyStateLabel: formatMessage({
+        id: 'admin/digital-river.catalogLogs.table.emptyLabel',
+      }),
     })
     setAppLoading(false)
   }
@@ -215,7 +219,9 @@ const CatalogLogs: FC = () => {
                     onClick={() => handleSyncCatalog(showToast)}
                     isLoading={syncLoading}
                   >
-                    Sync Catalog
+                    {formatMessage({
+                      id: 'admin/digital-river.catalogLogs.button.syncCatalog',
+                    })}
                   </Button>
                 </span>
               </PageHeader>
@@ -235,7 +241,9 @@ const CatalogLogs: FC = () => {
                   }
                   isLoading={syncLoading}
                 >
-                  Reload
+                  {formatMessage({
+                    id: 'admin/digital-river.catalogLogs.button.reload',
+                  })}
                 </Button>
               </section>
               <section className="pt4">
@@ -243,7 +251,7 @@ const CatalogLogs: FC = () => {
                   <Spinner />
                 ) : (
                   <Table
-                    schema={jsonschema(formatDate, formatTime)}
+                    schema={jsonschema(formatDate, formatTime, formatMessage)}
                     items={tableInfo.data}
                     emptyStateLabel={tableInfo.emptyStateLabel}
                     filters={{
@@ -254,10 +262,15 @@ const CatalogLogs: FC = () => {
                       collapseLeft: true,
                       options: {
                         error: {
-                          label: 'Status',
+                          label: formatMessage({
+                            id: 'admin/digital-river.catalogLogs.filter.status',
+                          }),
                           renderFilterLabel: (st: any) => {
                             if (!st || !st.object) {
-                              return 'All'
+                              return formatMessage({
+                                id:
+                                  'admin/digital-river.catalogLogs.filter.all',
+                              })
                             }
 
                             const keys = st.object ? Object.keys(st.object) : []
@@ -283,15 +296,24 @@ const CatalogLogs: FC = () => {
 
                             return `${
                               isAllTrue
-                                ? 'All'
+                                ? formatMessage({
+                                    id:
+                                      'admin/digital-river.catalogLogs.filter.all',
+                                  })
                                 : isAllFalse
-                                ? 'None'
+                                ? formatMessage({
+                                    id:
+                                      'admin/digital-river.catalogLogs.filter.none',
+                                  })
                                 : `${trueKeysLabel}`
                             }`
                           },
                           verbs: [
                             {
-                              label: 'Includes',
+                              label: formatMessage({
+                                id:
+                                  'admin/digital-river.catalogLogs.filter.includes',
+                              }),
                               value: 'includes',
                               object: statusSelectorObject,
                             },

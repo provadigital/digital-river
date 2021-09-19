@@ -18,5 +18,21 @@
   "admin/digital-river.taxStatus.otherTaxConfiguration": "(Disabled because another tax provider is already configured)",
   "admin/digital-river.saveSettings.buttonText": "Save settings",
   "admin/digital-river.saveSettings.success": "Settings have been saved",
-  "admin/digital-river.saveSettings.failure": "Error saving settings (see console for details)"
+  "admin/digital-river.saveSettings.failure": "Error saving settings (see console for details)",
+  "admin/digital-river.catalogLogs.button.syncCatalog": "Sync Catalog",
+  "admin/digital-river.catalogLogs.button.reload": "Reload",
+  "admin/digital-river.catalogLogs.filter.status": "Status",
+  "admin/digital-river.catalogLogs.filter.all": "All",
+  "admin/digital-river.catalogLogs.filter.none": "None",
+  "admin/digital-river.catalogLogs.filter.includes": "Includes",
+  "admin/digital-river.catalogLogs.table.status": "Status",
+  "admin/digital-river.catalogLogs.table.productId": "Product Id",
+  "admin/digital-river.catalogLogs.table.productSku": "Product SKU",
+  "admin/digital-river.catalogLogs.table.requestData": "Request Data",
+  "admin/digital-river.catalogLogs.table.responseData": "Response Data",
+  "admin/digital-river.catalogLogs.table.source": "Source",
+  "admin/digital-river.catalogLogs.table.executed": "Executed",
+  "admin/digital-river.catalogLogs.table.error": "Error",
+  "admin/digital-river.catalogLogs.table.success": "Success",
+  "admin/digital-river.catalogLogs.table.emptyLabel": "Nothing to show."
 }
