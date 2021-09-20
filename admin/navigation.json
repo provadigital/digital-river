@@ -2,5 +2,15 @@
   "section": "other",
   "path": "/admin/digital-river",
   "icon": "extensions-ic",
-  "titleId": "admin/digital-river.admin-menu-button"
+  "titleId": "admin/digital-river.admin-menu-button",
+  "subSectionItems": [
+    {
+      "labelId": "admin/digital-river.configuration-label",
+      "path": "/admin/digital-river/configuration"
+    },
+    {
+      "labelId": "admin/digital-river.catalog-logs-label",
+      "path": "/admin/digital-river/catalog-logs"
+    }
+  ]
 }

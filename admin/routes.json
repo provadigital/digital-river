@@ -1,9 +1,10 @@
 {
-  "admin.app.digital-river": {
-    "around": ["layout"],
-    "path": "/admin/app/digital-river/"
+  "admin.app.settings": {
+    "component": "Admin",
+    "path": "/admin/app/digital-river/configuration"
   },
-  "layout": {
-    "component": "Admin"
+  "admin.app.catalog-logs": {
+    "component": "CatalogLogs",
+    "path": "/admin/app/digital-river/catalog-logs"
   }
 }

@@ -11,9 +11,7 @@
       "url": "https://help-tickets.vtex.com/en/support?app=vtexus.connector-digital-river"
     },
     "type": "free",
-    "availableCountries": [
-      "*"
-    ]
+    "availableCountries": ["*"]
   },
   "dependencies": {
     "vtex.styleguide": "9.x",
@@ -47,10 +45,27 @@
       }
     },
     {
+      "name": "outbound-access",
+      "attrs": {
+        "host": "{{account}}.vtexcommercestable.com.br",
+        "path": "/api/*"
+      }
+    },
+    {
+      "name": "outbound-access",
+      "attrs": {
+        "host": "api.vtex.com",
+        "path": "/api/dataentities/*"
+      }
+    },
+    {
       "name": "ViewPayments"
     },
     {
       "name": "LogisticsViewer"
+    },
+    {
+      "name": "ADMIN_DS"
     },
     {
       "name": "colossus-fire-event"

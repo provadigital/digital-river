@@ -14,20 +14,24 @@ This app integrates Digital River with VTEX checkout, allowing shoppers to inter
 
 > ⚠️ _This app is under development. For this initial version, orders are sent to Digital River as tax inclusive. Future versions of this app will support integration of Digital River as a tax calculation provider._
 
-> ⚠️ _You must have a Digital River account, and all SKUs must be registered with Digital River. If a shopper attempts to check out with an unregistered SKU, the Digital River 'Drop-In' component will fail to load. Future versions of this app will include a catalog sync feature to automatically register SKUs with Digital River, but for now they must be registered manually using [Digital River's API](https://www.digitalriver.com/docs/digital-river-api-reference/#operation/createSkus)._
+> ⚠️ _You must have a Digital River account, and all SKUs must be registered with Digital River. This can be done by utilizing this app's catalog sync feature or through Digital River's API. If a shopper attempts to check out with an unregistered SKU, the Digital River 'Drop-In' component will fail to load._
 
 ## Configuration
 
 1. Install this app in the desired account using the CLI command `vtex install vtexus.connector-digital-river`. If you have multiple accounts configured in a marketplace-seller relationship, install the app and repeat the following steps in each of the related accounts.
-2. In your admin sidebar, access the **Other** section and click on `Digital River`.
-3. In the settings fields, enter your `Digital River token`, `VTEX App Key` and `VTEX App Token`. For initial testing, use a test `Digital River token` and leave the `Enable production mode` toggle turned off.
+2. In your admin sidebar, access the **Other** section and click on `Digital River` and then on `Configuration`.
+3. In the settings fields, enter your `Digital River token`, `VTEX App Key` and `VTEX App Token`. For initial testing, use a test `Digital River token` and leave the `Enable production mode` toggle turned off. Turn on the `Enable automatic catalog sync` toggle to enable syncing of SKUs from VTEX to Digital River each time a SKU is added or updated in your VTEX catalog.
 
 ⚠️ _For multiple accounts configured in a marketplace-seller relationship, the same `VTEX App Key` and `VTEX App Token` should be used for all of the accounts in which the app is installed. You can use any of the accounts to generate the key/token, and then grant additional permissions to the key/token by [creating a new user](https://help.vtex.com/en/tutorial/managing-users--tutorials_512) on each of the other accounts using the `VTEX App Key` in place of the user's email address, and then assigning the Owner role to that user._
 
-4. Add the following JavaScript to your `checkout6-custom.js` file, which is typically edited by accessing the **Store Setup** section in your admin sidebar and clicking `Checkout`, then clicking the blue gear icon and then the `Code` tab:
+4. Is recommended to do an initial full catalog sync between VTEX and Digital River. To do this access the **Other** section, click on `Digital River` and then click on `Catalog Sync Logs`. On this page, click on the button `SYNC CATALOG`. This will send all current SKUs from your VTEX catalog to Digital River. Note that the `Enable automatic catalog sync` setting must have been enabled in step 3 above.
+
+⚠️ _Note that each product must have valid values for `Tax Code`, `ECCN`, and `Country of origin` in the VTEX catalog to be eligible to be sent to Digital River. The logs on this page will show whether each SKU was processed successfully or encountered an error due to missing information. Since this process runs in the background there is a `RELOAD` button to refresh the logs._
+
+5. Add the following JavaScript to your `checkout6-custom.js` file, which is typically edited by accessing the **Store Setup** section in your admin sidebar and clicking `Checkout`, then clicking the blue gear icon and then the `Code` tab:
 
 ```js
-// DIGITAL RIVER Version 0.0.18
+// DIGITAL RIVER Version 1.0.0
 let checkoutUpdated = false
 const digitalRiverPaymentGroupClass = '.DigitalRiverPaymentGroup'
 const digitalRiverPaymentGroupButtonID =
@@ -129,6 +133,72 @@ function loadDigitalRiver() {
   u.parentNode.insertBefore(f, u)
 }
 
+function loadStoredCards(checkoutId) {
+  fetch(`${__RUNTIME__.rootPath || ``}/_v/api/digital-river/checkout/sources`)
+    .then((response) => {
+      return response.json()
+    })
+    .then(async (response) => {
+      if (response.customer && response.customer.sources) {
+        var sources = response.customer.sources
+        if (sources.length > 0) {
+          var radiosHtmls =
+            '<div class="stored-credit-cards-title" style="margin-bottom: 16px;"><span class="DR-payment-method-name DR-payment-method-name-with-image" style="color: rgba(0,0,0,.75); font-size: 1rem; font-weight: 400; line-height: 20px; margin: 0px;">Saved Cards</span></div>'
+          for (var i = 0; i < sources.length; i++) {
+            radiosHtmls +=
+              '<input name="DR-stored-cards" type="radio" id="' +
+              sources[i].id +
+              '" value="' +
+              sources[i].id +
+              '">'
+            radiosHtmls +=
+              '<label style="display: inline-block; vertical-align: sub; margin-bottom: 8px; margin-left: 4px; font-size: 0.875rem" for="' +
+              sources[i].id +
+              '">' +
+              sources[i].creditCard.brand +
+              ' ending with ' +
+              sources[i].creditCard.lastFourDigits +
+              ' expires ' +
+              ('0' + sources[i].creditCard.expirationMonth).slice(-2) +
+              '/' +
+              sources[i].creditCard.expirationYear +
+              '</label></br>'
+          }
+          radiosHtmls +=
+            '<div class="stored-credit-cards" style="margin-top: 16px;"><button id="submit-stored-creditCard" style="background-color: #1264a3; color: #FFF; height: 56px; border-radius: .25rem; text-align: center; border-top: none!important; border: none; font-weight: 400; padding: 1rem; width: 250px; margin-bottom: 24px;">BUY NOW WITH SAVED CARD</button></div>'
+
+          $('#drop-in').prepend(
+            '<div class="DR-stored-cards">' + radiosHtmls + '</div>'
+          )
+          $('#submit-stored-creditCard').click(function () {
+            var sourceId = $('input[name=DR-stored-cards]:checked').attr('id')
+            fetch(
+              `${
+                __RUNTIME__.rootPath || ``
+              }/_v/api/digital-river/checkout/update`,
+              {
+                method: 'POST',
+                body: JSON.stringify({
+                  checkoutId,
+                  sourceId,
+                  readyForStorage: false,
+                }),
+              }
+            )
+              .then((rawResponse) => {
+                return rawResponse.json()
+              })
+              .then(() => {
+                checkoutUpdated = true
+                clickBuyNowButton()
+              })
+          })
+          $('#' + sources[0].id).click()
+        }
+      }
+    })
+}
+
 async function initDigitalRiver(orderForm) {
   hideBuyNowButton()
 
@@ -150,7 +220,6 @@ async function initDigitalRiver(orderForm) {
     $(digitalRiverPaymentGroupClass).html(
       `<div><div class='DR-card'><div class='DR-collapse DR-show'><h5 class='DR-error-message'>${loginMessage}</h5><div><a style='cursor: pointer;' onClick='window.vtexid.start()' class='DR-button-text'>${loginButtonText}</a></div></div></div></div>`
     )
-
     return
   }
 
@@ -175,7 +244,7 @@ async function initDigitalRiver(orderForm) {
       const digitalriver = new DigitalRiver(digitalRiverPublicKey, {
         locale: orderForm.clientPreferencesData.locale
           ? orderForm.clientPreferencesData.locale.toLowerCase()
-          : 'en-us',
+          : 'en_US',
       })
 
       const country = await getCountryCode(
@@ -186,12 +255,12 @@ async function initDigitalRiver(orderForm) {
         sessionId: paymentSessionId,
         options: {
           flow: 'checkout',
-          showSavePaymentAgreement: false,
+          showComplianceSection: true,
+          showSavePaymentAgreement: true,
+          showTermsOfSaleDisclosure: true,
           button: {
             type: 'buyNow',
           },
-          showComplianceSection: true,
-          showTermsOfSaleDisclosure: false,
         },
         billingAddress: {
           firstName: orderForm.clientProfileData.firstName,
@@ -218,7 +287,11 @@ async function initDigitalRiver(orderForm) {
             }/_v/api/digital-river/checkout/update`,
             {
               method: 'POST',
-              body: JSON.stringify({ checkoutId, sourceId: data.source.id }),
+              body: JSON.stringify({
+                checkoutId,
+                sourceId: data.source.id,
+                readyForStorage: data.readyForStorage,
+              }),
             }
           )
             .then((rawResponse) => {
@@ -234,7 +307,9 @@ async function initDigitalRiver(orderForm) {
           console.error(data)
           renderErrorMessage(paymentErrorTitle, paymentErrorDescription, true)
         },
-        onReady(data) {},
+        onReady(data) {
+          loadStoredCards(checkoutId)
+        },
       }
 
       const dropin = digitalriver.createDropin(configuration)
@@ -281,14 +356,14 @@ $(window).on('orderFormUpdated.vtex', function (evt, orderForm) {
 })
 ```
 
-5. In your admin sidebar, access the **Transactions** section and click `Payments > Settings`.
-6. Click the `Gateway Affiliations` tab and click the green plus sign to add a new affiliation.
-7. Click `DigitalRiverV2` from the **Others** list.
-8. Modify the `Affiliation name` if desired, choose an `Auto Settlement` behavior from the dropdown (Digital River recommends setting this to "Disabled: Do Not Auto Settle") and then click `Save`. Leave `Application Key` and `Application Token` blank.
-9. Click the `Payment Conditions` tab and click the green plus sign to add a new payment condition.
-10. Click `DigitalRiver` from the **Other** list.
-11. In the `Process with affiliation` dropdown, choose the name of the affiliation that you created in step 8. Set the status to `Active` and click `Save`. Note that this will activate the payment method in checkout!
-12. After successfully testing the payment method in test mode, return to the Digital River app settings page from step 2. Replace your test `Digital River token` with a production token and turn on the `Enable Production mode` toggle. Save the settings and your checkout page will be all set to start accepting production orders.
+6. In your admin sidebar, access the **Transactions** section and click `Payments > Settings`.
+7. Click the `Gateway Affiliations` tab and click the green plus sign to add a new affiliation.
+8. Click `DigitalRiverV2` from the **Others** list.
+9. Modify the `Affiliation name` if desired, choose an `Auto Settlement` behavior from the dropdown (Digital River recommends setting this to "Disabled: Do Not Auto Settle") and then click `Save`. Leave `Application Key` and `Application Token` blank.
+10. Click the `Payment Conditions` tab and click the green plus sign to add a new payment condition.
+11. Click `DigitalRiver` from the **Other** list.
+12. In the `Process with affiliation` dropdown, choose the name of the affiliation that you created in step 8. Set the status to `Active` and click `Save`. Note that this will activate the payment method in checkout!
+13. After successfully testing the payment method in test mode, return to the Digital River app settings page from step 2. Replace your test `Digital River token` with a production token and turn on the `Enable Production mode` toggle. Save the settings and your checkout page will be all set to start accepting production orders.
 
 <!-- DOCS-IGNORE:start -->
 

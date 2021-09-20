@@ -9,6 +9,60 @@ export default class DigitalRiver extends ExternalClient {
     })
   }
 
+  // getCustomerById
+  public async getCustomerById({
+    settings,
+    customerId,
+  }: {
+    settings: AppSettings
+    customerId: string
+  }): Promise<DRCustomersResponse> {
+    return this.http.get(`/customers/${customerId}`, {
+      headers: {
+        Authorization: `Bearer ${settings.digitalRiverToken}`,
+        'Content-Type': `application/json`,
+      },
+    })
+  }
+
+  // createCustomer
+  public async createCustomer({
+    settings,
+    customerPayload,
+  }: {
+    settings: AppSettings
+    customerPayload: DRCustomerPayload
+  }): Promise<DRCustomerResponse> {
+    return this.http.post(`/customers`, JSON.stringify(customerPayload), {
+      headers: {
+        Authorization: `Bearer ${settings.digitalRiverToken}`,
+        'Content-Type': `application/json`,
+      },
+    })
+  }
+
+  // attachSourceCustomer
+  public async attachSourceCustomer({
+    settings,
+    customerId,
+    sourceId,
+  }: {
+    settings: AppSettings
+    customerId: string
+    sourceId: string
+  }): Promise<DRCustomerResponse> {
+    return this.http.post(
+      `/customers/${customerId}/sources/${sourceId}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${settings.digitalRiverToken}`,
+          'Content-Type': `application/json`,
+        },
+      }
+    )
+  }
+
   // createCheckout
   public async createCheckout({
     settings,
@@ -193,6 +247,23 @@ export default class DigitalRiver extends ExternalClient {
     payload: DRWebhookPayload
   }): Promise<DRWebhookResponse> {
     return this.http.post(`/webhooks`, JSON.stringify(payload), {
+      headers: {
+        Authorization: `Bearer ${settings.digitalRiverToken}`,
+        'Content-Type': `application/json`,
+      },
+    })
+  }
+
+  public async createSku({
+    settings,
+    skuId,
+    skuPayload,
+  }: {
+    settings: AppSettings
+    skuId: number
+    skuPayload: DRSkuPayload
+  }): Promise<DRSkuResponse> {
+    return this.http.put(`/skus/${skuId}`, JSON.stringify(skuPayload), {
       headers: {
         Authorization: `Bearer ${settings.digitalRiverToken}`,
         'Content-Type': `application/json`,

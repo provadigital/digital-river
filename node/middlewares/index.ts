@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { IncomingHttpHeaders } from 'http2'
 
 // import convertIso3To2 from 'country-iso-3-to-2'
@@ -361,13 +362,22 @@ export async function authorize(
       message: `Successfully created Digital River order using Checkout ID ${digitalRiverCheckoutId}. Digital River Order ID is ${
         orderResponse.data.id
       }. Digital River order state is ${orderResponse.data.state}. ${
-        orderResponse.data.sources.length
+        orderResponse.data.sources?.length
           ? `Payment method is ${orderResponse.data.sources[0].type}. `
           : ``
       } ${
-        orderResponse.data.sources.length &&
-        orderResponse.data.sources[0].type === 'creditCard'
+        orderResponse.data.payment?.sources?.length
+          ? `Payment method is ${orderResponse.data.payment.sources[0].type}. `
+          : ``
+      } ${
+        orderResponse.data.sources?.length &&
+        orderResponse.data.sources[0]?.type === 'creditCard'
           ? `Card details: ${orderResponse.data.sources[0].creditCard?.brand} Exp. ${orderResponse.data.sources[0].creditCard?.expirationMonth}/${orderResponse.data.sources[0].creditCard?.expirationYear} ending in ${orderResponse.data.sources[0].creditCard?.lastFourDigits}`
+          : ``
+      } ${
+        orderResponse.data.payment?.sources?.length &&
+        orderResponse.data.payment?.sources[0]?.type === 'creditCard'
+          ? `Card details: ${orderResponse.data.payment?.sources[0].creditCard?.brand} Exp. ${orderResponse.data.payment?.sources[0].creditCard?.expirationMonth}/${orderResponse.data.payment?.sources[0].creditCard?.expirationYear} ending in ${orderResponse.data.payment?.sources[0].creditCard?.lastFourDigits}`
           : ``
       }`,
       paymentId: content.paymentId,

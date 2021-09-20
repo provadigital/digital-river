@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { FC } from 'react'
 import React, { useState, useEffect } from 'react'
 import { useIntl } from 'react-intl'
@@ -6,6 +7,7 @@ import {
   Layout,
   PageHeader,
   PageBlock,
+  InputPassword,
   Input,
   Button,
   Toggle,
@@ -28,6 +30,7 @@ const Admin: FC = () => {
     vtexAppKey: '',
     vtexAppToken: '',
     isLive: false,
+    isAutomaticSync: false,
     enableTaxCalculation: false,
   })
 
@@ -159,6 +162,10 @@ const Admin: FC = () => {
       }
     }
 
+    await fetch(`/_v/api/digital-river/setup`, {
+      method: 'POST',
+      cache: 'no-cache',
+    })
     await saveSettings({
       variables: {
         version: process.env.VTEX_APP_VERSION,
@@ -195,14 +202,14 @@ const Admin: FC = () => {
             pageHeader={
               <PageHeader
                 title={formatMessage({
-                  id: 'admin/digital-river.title',
+                  id: 'admin/digital-river.configuration-label',
                 })}
               />
             }
           >
             <PageBlock>
               <section className="pb4">
-                <Input
+                <InputPassword
                   label={formatMessage({
                     id: 'admin/digital-river.settings.digitalRiverToken.label',
                   })}
@@ -236,7 +243,7 @@ const Admin: FC = () => {
                 />
               </section>
               <section className="pb4">
-                <Input
+                <InputPassword
                   label={formatMessage({
                     id: 'admin/digital-river.settings.vtexAppToken.label',
                   })}
@@ -269,6 +276,25 @@ const Admin: FC = () => {
                   }}
                   helpText={formatMessage({
                     id: 'admin/digital-river.settings.isLive.helpText',
+                  })}
+                />
+              </section>
+              <section className="pv4">
+                <Toggle
+                  semantic
+                  label={formatMessage({
+                    id: 'admin/digital-river.settings.isAutomaticSync.label',
+                  })}
+                  size="large"
+                  checked={settingsState.isAutomaticSync}
+                  onChange={() => {
+                    setSettingsState({
+                      ...settingsState,
+                      isAutomaticSync: !settingsState.isAutomaticSync,
+                    })
+                  }}
+                  helpText={formatMessage({
+                    id: 'admin/digital-river.settings.isAutomaticSync.helpText',
                   })}
                 />
               </section>

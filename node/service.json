@@ -6,6 +6,11 @@
   "minReplicas": 2,
   "maxReplicas": 12,
   "workers": 1,
+  "events": {
+    "skuChange": {
+      "keys": ["broadcaster.notification"]
+    }
+  },
   "routes": {
     "paymentMethods": {
       "path": "/_v/api/connectors/vtexus.connector-digital-river/v0/payment-methods",
@@ -49,6 +54,22 @@
     },
     "getISO2CountryCode": {
       "path": "/_v/api/digital-river/checkout/country-code/:country",
+      "public": true
+    },
+    "setup": {
+      "path": "/_v/api/digital-river/setup",
+      "public": true
+    },
+    "catalogSync": {
+      "path": "/_v/api/digital-river/catalog-sync",
+      "public": true
+    },
+    "catalogLogs": {
+      "path": "/_v/api/digital-river/catalog-logs",
+      "public": true
+    },
+    "getSources": {
+      "path": "/_v/api/digital-river/checkout/sources",
       "public": true
     }
   }
