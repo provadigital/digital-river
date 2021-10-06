@@ -25,6 +25,40 @@ export default class DigitalRiver extends ExternalClient {
     })
   }
 
+  // getCustomers
+  public async getCustomers({
+    settings,
+    params,
+  }: {
+    settings: AppSettings
+    params: any
+  }): Promise<DRCustomersResponse> {
+    return this.http.get(`/customers`, {
+      headers: {
+        Authorization: `Bearer ${settings.digitalRiverToken}`,
+        'Content-Type': `application/json`,
+      },
+      params,
+    })
+  }
+
+  // getTaxIds
+  public async getTaxIds({
+    settings,
+    params,
+  }: {
+    settings: AppSettings
+    params: any
+  }): Promise<DRTaxIdentifiersResponse> {
+    return this.http.get(`/tax-identifiers`, {
+      headers: {
+        Authorization: `Bearer ${settings.digitalRiverToken}`,
+        'Content-Type': `application/json`,
+      },
+      params,
+    })
+  }
+
   // createCustomer
   public async createCustomer({
     settings,
