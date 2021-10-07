@@ -195,7 +195,7 @@ export async function digitalRiverCustomers(
   const app: string = getAppId()
   const settings = await apps.getAppSettings(app)
 
-  authUser(settings, headers, identity)
+  await authUser(settings, headers, identity)
 
   let customerList = null
 
@@ -234,12 +234,12 @@ export async function digitalRiverTaxIds(
   const app: string = getAppId()
   const settings = await apps.getAppSettings(app)
 
-  authUser(settings, headers, identity)
+  await authUser(settings, headers, identity)
 
   let taxIds = null
 
   try {
-    taxIds = await digitalRiver.getCustomers({
+    taxIds = await digitalRiver.getTaxIds({
       settings,
       params: query,
     })
