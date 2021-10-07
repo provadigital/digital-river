@@ -433,7 +433,7 @@ _Example Response:_
 }
 ```
 
-⚠️ _For /tax-identifiers API, the key version must be either version 2021-02-23 or 2021-03-23 for it it to function
+⚠️ _For `/tax-identifiers API`, the key version must be either version 2021-02-23 or 2021-03-23 for it it to function
 
 <!-- DOCS-IGNORE:start -->
 
