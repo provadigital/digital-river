@@ -231,10 +231,10 @@ export async function digitalRiverTaxIds(
     request: { query, headers },
   } = ctx
 
+  await authUser(headers, identity)
+
   const app: string = getAppId()
   const settings = await apps.getAppSettings(app)
-
-  await authUser(settings, headers, identity)
 
   let taxIds = null
 
@@ -260,17 +260,13 @@ export async function digitalRiverTaxIds(
   await next()
 }
 
-async function authUser(settings: any, headers: any, identity: any) {
+async function authUser(headers: any, identity: any) {
   const token = headers.vtexidclientautcookie
 
   const authorization = await identity.validateToken({ token })
 
   if (!authorization || authorization.authStatus !== 'Success') {
     throw new AuthenticationError('Unauthorized application!')
-  }
-
-  if (!settings.vtexAppKey || !settings.vtexAppToken) {
-    throw new AuthenticationError('Missing VTEX app key and token')
   }
 }
 

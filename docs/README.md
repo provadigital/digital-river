@@ -367,11 +367,11 @@ $(window).on('orderFormUpdated.vtex', function (evt, orderForm) {
 
 ## Digital River APIs
 
-| Field            | Value                                                                               |
-|------------------|-------------------------------------------------------------------------------------|
-| **URI**          | /_v/api/digital-river/customers                                                     |
-| **METHOD**       | GET                                                                                 |
-| **API Usage**    | Gets all the customers. This API has the same query params as the digital river API |
+| Field            | Value                                                                                      |
+|------------------|--------------------------------------------------------------------------------------------|
+| **URI**          | /_v/api/digital-river/customers                                                            |
+| **METHOD**       | GET                                                                                        |
+| **API Usage**    | Gets all the customers. This API accepts the same query params as the [Digital River API](https://www.digitalriver.com/docs/digital-river-api-reference/#operation/listCustomers) |
 
 _Example Headers:_
 VtexIdClientAutCookie: **VtexIdClientAutCookie**
@@ -394,11 +394,11 @@ _Example Response:_
 }
 ```
 
-| Field            | Value                                                                             |
-|------------------|-----------------------------------------------------------------------------------|
-| **URI**          | /_v/api/digital-river/tax-identifiers                                             |
-| **METHOD**       | GET                                                                               |
-| **API Usage**    | Gets all the tax ids. This API has the same query params as the digital river API |
+| Field            | Value                                                                                       |
+|------------------|---------------------------------------------------------------------------------------------|
+| **URI**          | /_v/api/digital-river/tax-identifiers                                                       |
+| **METHOD**       | GET                                                                                         |
+| **API Usage**    | Gets all the tax ids. This API accepts the same query parameters as the [Digital River API](https://www.digitalriver.com/docs/digital-river-api-reference/#operation/listTaxIdentifiers) |
 
 _Example Headers:_
 VtexIdClientAutCookie: **VtexIdClientAutCookie**
