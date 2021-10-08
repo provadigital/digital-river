@@ -192,10 +192,10 @@ export async function digitalRiverCustomers(
     request: { query, headers },
   } = ctx
 
+  await authUser(headers, identity)
+
   const app: string = getAppId()
   const settings = await apps.getAppSettings(app)
-
-  await authUser(settings, headers, identity)
 
   let customerList = null
 
