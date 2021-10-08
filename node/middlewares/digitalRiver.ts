@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import pThrottle from 'p-throttle'
 import type { EventContext } from '@vtex/api'
-import { ResolverError } from '@vtex/api'
+import { AuthenticationError, ResolverError } from '@vtex/api'
 
 import {
   countries,
@@ -180,6 +180,94 @@ export async function digitalRiverCatalogSync(
 
   ctx.status = 200
   await next()
+}
+
+export async function digitalRiverCustomers(
+  ctx: Context,
+  next: () => Promise<unknown>
+) {
+  const {
+    clients: { apps, digitalRiver, identity },
+    vtex: { logger },
+    request: { query, headers },
+  } = ctx
+
+  await authUser(headers, identity)
+
+  const app: string = getAppId()
+  const settings = await apps.getAppSettings(app)
+
+  let customerList = null
+
+  try {
+    customerList = await digitalRiver.getCustomers({
+      settings,
+      params: query,
+    })
+  } catch (err) {
+    logger.error({
+      error: err,
+      message: 'DigitalRiverGetAllCustomers-getCustomers',
+    })
+
+    throw new ResolverError({
+      message: 'Get all customers failed',
+      error: err,
+    })
+  }
+
+  ctx.body = customerList
+  ctx.status = 200
+  await next()
+}
+
+export async function digitalRiverTaxIds(
+  ctx: Context,
+  next: () => Promise<unknown>
+) {
+  const {
+    clients: { apps, digitalRiver, identity },
+    vtex: { logger },
+    request: { query, headers },
+  } = ctx
+
+  await authUser(headers, identity)
+
+  const app: string = getAppId()
+  const settings = await apps.getAppSettings(app)
+
+  let taxIds = null
+
+  try {
+    taxIds = await digitalRiver.getTaxIds({
+      settings,
+      params: query,
+    })
+  } catch (err) {
+    logger.error({
+      error: err,
+      message: 'DigitalRiverGetAllTaxIds-getTaxIds',
+    })
+
+    throw new ResolverError({
+      message: 'Get all tax ids failed',
+      error: err,
+    })
+  }
+
+  ctx.body = taxIds
+  ctx.status = 200
+  await next()
+}
+
+async function authUser(headers: any, identity: any) {
+  const token = headers.vtexidclientautcookie
+
+  const authorization = await identity.validateToken({ token })
+
+  if (!authorization || authorization.authStatus !== 'Success') {
+    throw new AuthenticationError('Unauthorized application!')
+  }
 }
 
 async function createOrUpdateSku(

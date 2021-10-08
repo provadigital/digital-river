@@ -487,3 +487,22 @@ interface DRCustomerResponse {
   email: string
   enabled: boolean
 }
+
+interface DRTaxIdentifiersResponse {
+  hasMore: boolean
+  data: DRTaxIdentifierResponse[]
+}
+
+interface DRTaxIdentifierResponse {
+  id: string
+  createdTime: string
+  customerId: string
+  type: string
+  value: string
+  state: string
+  stateTransitions: any
+  verifiedName: string
+  verifiedAddress: string
+  updatedTime: string
+  applicability: any[]
+}

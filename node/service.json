@@ -71,6 +71,14 @@
     "getSources": {
       "path": "/_v/api/digital-river/checkout/sources",
       "public": true
+    },
+    "getAllCustomers": {
+      "path": "/_v/api/digital-river/customers",
+      "public": true
+    },
+    "getAllTaxIds": {
+      "path": "/_v/api/digital-river/tax-identifiers",
+      "public": true
     }
   }
 }

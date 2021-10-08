@@ -365,6 +365,76 @@ $(window).on('orderFormUpdated.vtex', function (evt, orderForm) {
 12. In the `Process with affiliation` dropdown, choose the name of the affiliation that you created in step 8. Set the status to `Active` and click `Save`. Note that this will activate the payment method in checkout!
 13. After successfully testing the payment method in test mode, return to the Digital River app settings page from step 2. Replace your test `Digital River token` with a production token and turn on the `Enable Production mode` toggle. Save the settings and your checkout page will be all set to start accepting production orders.
 
+## Digital River APIs
+
+| Field            | Value                                                                                      |
+|------------------|--------------------------------------------------------------------------------------------|
+| **URI**          | /_v/api/digital-river/customers                                                            |
+| **METHOD**       | GET                                                                                        |
+| **API Usage**    | Gets all the customers. This API accepts the same query params as the [Digital River API](https://www.digitalriver.com/docs/digital-river-api-reference/#operation/listCustomers) |
+
+_Example Headers:_
+VtexIdClientAutCookie: **VtexIdClientAutCookie**
+
+_Example Response:_
+```json
+{
+    "hasMore": false,
+    "data": [
+        {
+            "id": "540988630336",
+            "createdTime": "2021-08-16T15:30:53Z",
+            "liveMode": false,
+            "enabled": true,
+            "requestToBeForgotten": false,
+            "locale": "en_US",
+            "type": "individual"
+        }
+    ]
+}
+```
+
+| Field            | Value                                                                                       |
+|------------------|---------------------------------------------------------------------------------------------|
+| **URI**          | /_v/api/digital-river/tax-identifiers                                                       |
+| **METHOD**       | GET                                                                                         |
+| **API Usage**    | Gets all the tax ids. This API accepts the same query parameters as the [Digital River API](https://www.digitalriver.com/docs/digital-river-api-reference/#operation/listTaxIdentifiers) |
+
+_Example Headers:_
+VtexIdClientAutCookie: **VtexIdClientAutCookie**
+
+_Example Response:_
+```json
+{
+    "hasMore": false,
+    "data": [
+        {
+            "id": "39dc5358-0449-4711-af1b-c90e009638eb",
+            "state": "verified",
+            "verifiedName": "---",
+            "verifiedAddress": "---",
+            "liveMode": false,
+            "type": "de",
+            "value": "DE123456789",
+            "stateTransitions": {
+                "verified": "2021-10-07T19:21:59Z"
+            },
+            "createdTime": "2021-10-07T19:21:59Z",
+            "updatedTime": "2021-10-07T19:21:59Z",
+            "applicability": [
+                {
+                    "country": "DE",
+                    "entity": "DR_IRELAND-ENTITY",
+                    "customerType": "business"
+                }
+            ]
+        }
+    ]
+}
+```
+
+> ⚠️ _For `/tax-identifiers API`, the key version must be either version 2021-02-23 or 2021-03-23 for it it to function_
+
 <!-- DOCS-IGNORE:start -->
 
 ## Contributors ✨
