@@ -28,17 +28,16 @@ export default class DigitalRiver extends ExternalClient {
   // getCustomers
   public async getCustomers({
     settings,
-    params,
+    email,
   }: {
     settings: AppSettings
-    params: any
+    email: string
   }): Promise<DRCustomersResponse> {
-    return this.http.get(`/customers`, {
+    return this.http.get(`/customers?email=${email}`, {
       headers: {
         Authorization: `Bearer ${settings.digitalRiverToken}`,
         'Content-Type': `application/json`,
       },
-      params,
     })
   }
 

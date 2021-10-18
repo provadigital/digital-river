@@ -371,26 +371,15 @@ $(window).on('orderFormUpdated.vtex', function (evt, orderForm) {
 |------------------|--------------------------------------------------------------------------------------------|
 | **URI**          | /_v/api/digital-river/customers                                                            |
 | **METHOD**       | GET                                                                                        |
-| **API Usage**    | Gets all the customers. This API accepts the same query params as the [Digital River API](https://www.digitalriver.com/docs/digital-river-api-reference/#operation/listCustomers) |
+| **API Usage**    | Uses the orderFormId to get a matching Digital River customer                              |
 
 _Example Headers:_
-VtexIdClientAutCookie: **VtexIdClientAutCookie**
+orderFormId: **orderFormId**
 
 _Example Response:_
 ```json
 {
-    "hasMore": false,
-    "data": [
-        {
-            "id": "540988630336",
-            "createdTime": "2021-08-16T15:30:53Z",
-            "liveMode": false,
-            "enabled": true,
-            "requestToBeForgotten": false,
-            "locale": "en_US",
-            "type": "individual"
-        }
-    ]
+  "id": "540988630336"
 }
 ```
 
