@@ -387,37 +387,19 @@ _Example Response:_
 |------------------|---------------------------------------------------------------------------------------------|
 | **URI**          | /_v/api/digital-river/tax-identifiers                                                       |
 | **METHOD**       | GET                                                                                         |
-| **API Usage**    | Gets all the tax ids. This API accepts the same query parameters as the [Digital River API](https://www.digitalriver.com/docs/digital-river-api-reference/#operation/listTaxIdentifiers) |
+| **API Usage**    | Returns all tax ids. This API accepts the same query parameters as the [Digital River API](https://www.digitalriver.com/docs/digital-river-api-reference/#operation/listTaxIdentifiers) |
 
 _Example Headers:_
-VtexIdClientAutCookie: **VtexIdClientAutCookie**
+No headers necessary
 
 _Example Response:_
 ```json
 {
-    "hasMore": false,
-    "data": [
-        {
-            "id": "39dc5358-0449-4711-af1b-c90e009638eb",
-            "state": "verified",
-            "verifiedName": "---",
-            "verifiedAddress": "---",
-            "liveMode": false,
-            "type": "de",
-            "value": "DE123456789",
-            "stateTransitions": {
-                "verified": "2021-10-07T19:21:59Z"
-            },
-            "createdTime": "2021-10-07T19:21:59Z",
-            "updatedTime": "2021-10-07T19:21:59Z",
-            "applicability": [
-                {
-                    "country": "DE",
-                    "entity": "DR_IRELAND-ENTITY",
-                    "customerType": "business"
-                }
-            ]
-        }
+    "id": [
+        "a77cea02-ac3c-45a5-ac7e-e32aff524bc2",
+        "f0c356fe-8779-4775-a6d3-17267816acd0",
+        "7769196c-41c1-4832-a389-399b3be318c4",
+        "39dc5358-0449-4711-af1b-c90e009638eb"
     ]
 }
 ```

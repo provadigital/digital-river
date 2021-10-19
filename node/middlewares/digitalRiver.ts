@@ -266,8 +266,6 @@ export async function digitalRiverTaxIds(
     })
   }
 
-  ctx.body = taxIds
-  /*
   if (taxIds.data.length > 0) {
     ctx.body = {
       id: taxIds.data.map((taxId: { id: any }) => {
@@ -277,7 +275,6 @@ export async function digitalRiverTaxIds(
   } else {
     ctx.body = { message: 'Tax Ids can not be found' }
   }
-  */
 
   ctx.status = 200
   await next()
