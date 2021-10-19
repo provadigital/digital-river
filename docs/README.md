@@ -371,7 +371,7 @@ $(window).on('orderFormUpdated.vtex', function (evt, orderForm) {
 |------------------|--------------------------------------------------------------------------------------------|
 | **URI**          | /_v/api/digital-river/customers                                                            |
 | **METHOD**       | GET                                                                                        |
-| **API Usage**    | Uses the orderFormId to get a matching Digital River customer                              |
+| **API Usage**    | Uses the orderFormId to get a matching Digital River customer. The email in the checkout must exist in Digital River     |
 
 _Example Headers:_
 orderFormId: **orderFormId**
