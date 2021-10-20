@@ -318,6 +318,8 @@ export const countries = [
   'AX - Åland Islands',
 ]
 
+export const AUTHORIZATION_CODE = 'MjZiOTkzNWIwNDhkZmQ4Njg5M2QwYmY5Y2E2Mjg4NDk'
+
 export const schema = {
   properties: {
     productId: {

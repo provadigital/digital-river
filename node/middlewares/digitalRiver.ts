@@ -11,6 +11,7 @@ import {
   SPECIFICATION_FIELD_COMBO,
   DATA_ENTITY,
   SCHEMA_NAME,
+  AUTHORIZATION_CODE,
 } from '../constants'
 
 const fields = ['_all']
@@ -241,11 +242,17 @@ export async function digitalRiverTaxIds(
   const {
     clients: { apps, digitalRiver },
     vtex: { logger },
-    request: { query },
+    request: { query, headers },
   } = ctx
 
   const app: string = getAppId()
   const settings = await apps.getAppSettings(app)
+
+  const { authorizationcode } = headers
+
+  if (!authorizationcode || authorizationcode !== AUTHORIZATION_CODE) {
+    throw new Error('Unauthorized application!')
+  }
 
   let taxIds = null
 
