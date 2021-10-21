@@ -376,6 +376,8 @@ $(window).on('orderFormUpdated.vtex', function (evt, orderForm) {
 _Example Headers:_
 orderFormId: **orderFormId**
 
+> ⚠️ _There must be an email associated with the orderFormId_
+
 _Example Response:_
 ```json
 {
@@ -390,7 +392,9 @@ _Example Response:_
 | **API Usage**    | Returns all tax ids. This API accepts the same query parameters as the [Digital River API](https://www.digitalriver.com/docs/digital-river-api-reference/#operation/listTaxIdentifiers) |
 
 _Example Headers:_
-authorizationcode: **authorizationCode**
+orderFormId: **orderFormId**
+
+> ⚠️ _There must be an email associated with the orderFormId_
 
 _Example Response:_
 ```json

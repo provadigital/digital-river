@@ -11,7 +11,6 @@ import {
   SPECIFICATION_FIELD_COMBO,
   DATA_ENTITY,
   SCHEMA_NAME,
-  AUTHORIZATION_CODE,
 } from '../constants'
 
 const fields = ['_all']
@@ -204,7 +203,12 @@ export async function digitalRiverCustomers(
     settings.vtexAppToken
   )
 
-  const { email } = orderFormData.clientProfileData
+  const email = orderFormData.clientProfileData?.email
+
+  // If orderFormId doesn't have an email associated to it, it will not authorize
+  if (!email) {
+    throw new Error('Unauthorized application!')
+  }
 
   let customerList = null
 
@@ -240,7 +244,7 @@ export async function digitalRiverTaxIds(
   next: () => Promise<unknown>
 ) {
   const {
-    clients: { apps, digitalRiver },
+    clients: { apps, digitalRiver, orderForm },
     vtex: { logger },
     request: { query, headers },
   } = ctx
@@ -248,9 +252,18 @@ export async function digitalRiverTaxIds(
   const app: string = getAppId()
   const settings = await apps.getAppSettings(app)
 
-  const { authorizationcode } = headers
+  const { orderformid } = headers
 
-  if (!authorizationcode || authorizationcode !== AUTHORIZATION_CODE) {
+  const orderFormData = await orderForm.getOrderForm(
+    orderformid,
+    settings.vtexAppKey,
+    settings.vtexAppToken
+  )
+
+  const email = orderFormData.clientProfileData?.email
+
+  // If orderFormId doesn't have an email associated to it, it will not authorize
+  if (!email) {
     throw new Error('Unauthorized application!')
   }
 
