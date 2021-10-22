@@ -6,7 +6,7 @@ export const VTEX_SESSION = 'vtex_session'
 
 export async function getSession(context: Context) {
   const {
-    clients: { customSession },
+    clients: { session },
     cookies,
   } = context
 
@@ -18,7 +18,7 @@ export async function getSession(context: Context) {
     )
   }
 
-  const { sessionData } = await customSession.getSession(sessionCookie, ['*'])
+  const { sessionData } = await session.getSession(sessionCookie, ['*'])
 
   return sessionFields(sessionData)
 }
