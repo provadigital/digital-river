@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import pThrottle from 'p-throttle'
 import type { EventContext } from '@vtex/api'
-import { AuthenticationError, ResolverError } from '@vtex/api'
+import { ResolverError } from '@vtex/api'
 
 import {
   countries,
@@ -187,22 +187,35 @@ export async function digitalRiverCustomers(
   next: () => Promise<unknown>
 ) {
   const {
-    clients: { apps, digitalRiver, identity },
+    clients: { apps, digitalRiver, orderForm },
     vtex: { logger },
-    request: { query, headers },
+    request: { headers },
   } = ctx
-
-  await authUser(headers, identity)
 
   const app: string = getAppId()
   const settings = await apps.getAppSettings(app)
+
+  const { orderformid } = headers
+
+  const orderFormData = await orderForm.getOrderForm(
+    orderformid,
+    settings.vtexAppKey,
+    settings.vtexAppToken
+  )
+
+  const email = orderFormData.clientProfileData?.email
+
+  // If orderFormId doesn't have an email associated to it, it will not authorize
+  if (!email) {
+    throw new Error('Unauthorized application!')
+  }
 
   let customerList = null
 
   try {
     customerList = await digitalRiver.getCustomers({
       settings,
-      params: query,
+      email,
     })
   } catch (err) {
     logger.error({
@@ -216,7 +229,12 @@ export async function digitalRiverCustomers(
     })
   }
 
-  ctx.body = customerList
+  if (customerList.data.length === 1) {
+    ctx.body = { id: customerList.data[0].id }
+  } else {
+    ctx.body = { message: 'Account can not be found' }
+  }
+
   ctx.status = 200
   await next()
 }
@@ -226,15 +244,28 @@ export async function digitalRiverTaxIds(
   next: () => Promise<unknown>
 ) {
   const {
-    clients: { apps, digitalRiver, identity },
+    clients: { apps, digitalRiver, orderForm },
     vtex: { logger },
     request: { query, headers },
   } = ctx
 
-  await authUser(headers, identity)
-
   const app: string = getAppId()
   const settings = await apps.getAppSettings(app)
+
+  const { orderformid } = headers
+
+  const orderFormData = await orderForm.getOrderForm(
+    orderformid,
+    settings.vtexAppKey,
+    settings.vtexAppToken
+  )
+
+  const email = orderFormData.clientProfileData?.email
+
+  // If orderFormId doesn't have an email associated to it, it will not authorize
+  if (!email) {
+    throw new Error('Unauthorized application!')
+  }
 
   let taxIds = null
 
@@ -255,19 +286,18 @@ export async function digitalRiverTaxIds(
     })
   }
 
-  ctx.body = taxIds
+  if (taxIds.data.length > 0) {
+    ctx.body = {
+      id: taxIds.data.map((taxId: { id: any }) => {
+        return taxId.id
+      }),
+    }
+  } else {
+    ctx.body = { message: 'Tax Ids can not be found' }
+  }
+
   ctx.status = 200
   await next()
-}
-
-async function authUser(headers: any, identity: any) {
-  const token = headers.vtexidclientautcookie
-
-  const authorization = await identity.validateToken({ token })
-
-  if (!authorization || authorization.authStatus !== 'Success') {
-    throw new AuthenticationError('Unauthorized application!')
-  }
 }
 
 async function createOrUpdateSku(
