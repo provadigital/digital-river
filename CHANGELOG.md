@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.1.2] - 2021-10-25
+
 ### Added
 
 - Updated the /customers and /tax-identifiers API to use orderFormId in the header for auth
