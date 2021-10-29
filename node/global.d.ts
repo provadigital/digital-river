@@ -506,3 +506,8 @@ interface DRTaxIdentifierResponse {
   updatedTime: string
   applicability: any[]
 }
+
+interface DRCreateTaxIdentifierRequest {
+  type: string
+  value: string
+}

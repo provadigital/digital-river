@@ -408,6 +408,64 @@ _Example Response:_
 }
 ```
 
+
+| Field            | Value                                                                                       |
+|------------------|---------------------------------------------------------------------------------------------|
+| **URI**          | /_v/api/digital-river/tax-identifiers                                                       |
+| **METHOD**       | POST                                                                                         |
+| **API Usage**    | Returns the created tax id. [Digital River API](https://www.digitalriver.com/docs/digital-river-api-reference/#operation/createTaxIdentifiers) |
+
+_Example Headers:_
+orderFormId: **orderFormId**
+
+> ⚠️ _There must be an email associated with the orderFormId_
+
+_Example Request:_
+```json
+{
+    "type": "uk",
+    "value": "GB999999999"
+}
+```
+
+_Example Response:_
+```json
+{
+    "id": "0ea76f4b-372a-41c1-9488-b0a8b13ade58",
+    "state": "verified",
+    "liveMode": false,
+    "type": "uk",
+    "value": "GB999999999",
+    "stateTransitions": {
+        "verified": "2021-10-28T20:41:20Z"
+    },
+    "createdTime": "2021-10-28T20:41:20Z",
+    "updatedTime": "2021-10-28T20:41:20Z",
+    "applicability": [
+        {
+            "country": "IM",
+            "entity": "DR_UK-ENTITY",
+            "customerType": "business"
+        },
+        {
+            "country": "IM",
+            "entity": "DR_IRELAND-ENTITY",
+            "customerType": "business"
+        },
+        {
+            "country": "GB",
+            "entity": "DR_UK-ENTITY",
+            "customerType": "business"
+        },
+        {
+            "country": "GB",
+            "entity": "DR_IRELAND-ENTITY",
+            "customerType": "business"
+        }
+    ]
+}
+```
+
 > ⚠️ _For `/tax-identifiers API`, the key version must be either version 2021-02-23 or 2021-03-23 for it it to function_
 
 <!-- DOCS-IGNORE:start -->

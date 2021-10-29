@@ -58,6 +58,22 @@ export default class DigitalRiver extends ExternalClient {
     })
   }
 
+  // getTaxIds
+  public async createTaxId({
+    settings,
+    taxIdBody,
+  }: {
+    settings: AppSettings
+    taxIdBody: DRCreateTaxIdentifierRequest
+  }): Promise<DRTaxIdentifiersResponse> {
+    return this.http.post(`/tax-identifiers`, JSON.stringify(taxIdBody), {
+      headers: {
+        Authorization: `Bearer ${settings.digitalRiverToken}`,
+        'Content-Type': `application/json`,
+      },
+    })
+  }
+
   // createCustomer
   public async createCustomer({
     settings,
