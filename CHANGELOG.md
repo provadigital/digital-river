@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+
+- Added a post request for /tax-identifiers
+- Returned customerId in createCheckout
+
 ## [1.1.2] - 2021-10-25
 
 ### Added

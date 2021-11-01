@@ -76,7 +76,7 @@
       "path": "/_v/api/digital-river/customers",
       "public": true
     },
-    "getAllTaxIds": {
+    "taxIds": {
       "path": "/_v/api/digital-river/tax-identifiers",
       "public": true
     }

@@ -313,6 +313,7 @@ export async function digitalRiverCreateCheckout(
     checkoutId: checkoutResponse.id,
     paymentSessionId:
       checkoutResponse.paymentSessionId || checkoutResponse.payment.session.id,
+    customerId: checkoutResponse.customerId,
   }
 
   await next()
