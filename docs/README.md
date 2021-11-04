@@ -225,7 +225,13 @@ async function initDigitalRiver(orderForm) {
 
   fetch(`${__RUNTIME__.rootPath || ``}/_v/api/digital-river/checkout/create`, {
     method: 'POST',
-    body: JSON.stringify({ orderFormId: orderForm.orderFormId }),
+    body: JSON.stringify({ orderFormId: orderForm.orderFormId, taxIdPayload: { // NOTE: The taxIdPayload field is optional
+      taxId: {
+        "type": "uk",
+        "value": "GB999999999"
+      },
+      customerType: "business"
+    }}),
   })
     .then((response) => {
       return response.json()

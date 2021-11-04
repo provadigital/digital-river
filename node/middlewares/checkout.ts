@@ -9,6 +9,13 @@ import type { SessionFields } from '../resolvers/session/sessionResolver'
 
 interface CreateCheckoutRequest {
   orderFormId: string
+  taxIdPayload?: {
+    taxId: {
+      type: string
+      value: string
+    }
+    customerType: string
+  }
 }
 interface UpdateCheckoutRequest {
   checkoutId: string
@@ -237,6 +244,34 @@ export async function digitalRiverCreateCheckout(
     }
   }
 
+  const taxIdPayload = createCheckoutRequest?.taxIdPayload
+
+  let taxIdResult = null
+
+  if (taxIdPayload) {
+    try {
+      taxIdResult = await digitalRiver.createTaxId({
+        settings,
+        taxIdBody: taxIdPayload.taxId,
+      })
+    } catch (err) {
+      logger.error({
+        error: err,
+        message: 'DigitalRiverCreateCheckout-createTaxIdFailed',
+      })
+
+      throw new ResolverError({
+        message: 'Create Tax Id Failed',
+        error: err,
+      })
+    }
+  }
+
+  logger.info({
+    message: 'DigitalRiverCreateCheckout-createTaxId',
+    taxIdResult,
+  })
+
   const checkoutPayload: DRCheckoutPayload = {
     applicationId,
     currency: orderFormData?.storePreferencesData?.currencyCode ?? 'USD',
@@ -277,6 +312,11 @@ export async function digitalRiverCreateCheckout(
       description: '',
       serviceLevel: '',
     },
+  }
+
+  if (taxIdResult) {
+    checkoutPayload.customerType = taxIdPayload?.customerType
+    checkoutPayload.taxIdentifiers = [{ id: taxIdResult.id }]
   }
 
   logger.info({
