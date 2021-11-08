@@ -82,6 +82,11 @@ interface DRCheckoutPayload {
   metadata?: CheckoutMetadata
   shippingChoice: CheckoutShippingChoice | null
   locale: string
+  customerType?: string
+  taxIdentifiers?: DRCheckoutTaxIdentifiers[]
+}
+interface DRCheckoutTaxIdentifiers {
+  id: string
 }
 interface DRCheckoutResponse {
   id: string

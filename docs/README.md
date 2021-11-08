@@ -225,7 +225,13 @@ async function initDigitalRiver(orderForm) {
 
   fetch(`${__RUNTIME__.rootPath || ``}/_v/api/digital-river/checkout/create`, {
     method: 'POST',
-    body: JSON.stringify({ orderFormId: orderForm.orderFormId }),
+    body: JSON.stringify({ orderFormId: orderForm.orderFormId, taxIdPayload: { // NOTE: The taxIdPayload field is optional
+      taxId: {
+        "type": "uk",
+        "value": "GB999999999"
+      },
+      customerType: "business"
+    }}),
   })
     .then((response) => {
       return response.json()
@@ -466,7 +472,31 @@ _Example Response:_
 }
 ```
 
-> ⚠️ _For `/tax-identifiers API`, the key version must be either version 2021-02-23 or 2021-03-23 for it it to function_
+
+
+| Field            | Value                                                                                       |
+|------------------|---------------------------------------------------------------------------------------------|
+| **URI**          | /_v/api/digital-river/checkout/create                                                   |
+| **METHOD**       | POST                                                                                         |
+| **API Usage**    | Creates Checkout [Digital River API](https://www.digitalriver.com/docs/digital-river-api-reference/#operation/createCheckouts) |
+
+> ⚠️ _The taxId type must match the country where the product is shipped to. Moreover, the taxId value must be valid. The `customerType` field must be either business or individual. Please See the supported customerType with respect to the nation it is shipped to. [Supported TaxId Types](https://docs.digitalriver.com/digital-river-api/checkouts/creating-checkouts/tax-identifiers#supported-tax-identifiers)_
+
+_Example Request:_
+```json
+{
+  "orderFormId": "orderFormId",
+  "taxIdPayload": {
+    "taxId": {
+      "type": "uk",
+      "value": "GB999999999"
+    },
+    "customerType": "business" // Or "individual"
+  }
+}
+```
+
+> ⚠️ _For `/create API` to utilize the taxIdPayload, the key version must be either version 2021-02-23 or 2021-03-23 for it it to function._
 
 <!-- DOCS-IGNORE:start -->
 

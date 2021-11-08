@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+
+- Attached taxId to checkout whenever present
+
 ## [1.2.0] - 2021-11-01
 
 ### Added
