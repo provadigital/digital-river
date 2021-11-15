@@ -1,0 +1,8 @@
+{
+  "my-account-page.digital-river-credit-cards-page": {
+    "component": "CreditCardsPage"
+  },
+  "my-account-link.digital-river-credit-cards-link": {
+    "component": "CreditCardsLink"
+  }
+}

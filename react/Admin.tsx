@@ -26,12 +26,14 @@ const Admin: FC = () => {
   const { account } = useRuntime()
 
   const [settingsState, setSettingsState] = useState({
+    digitalRiverPublicKey: '',
     digitalRiverToken: '',
     vtexAppKey: '',
     vtexAppToken: '',
     isLive: false,
     isAutomaticSync: false,
-    enableTaxCalculation: false,
+    enableTaxCalculation: true,
+    enableTaxInclusive: false
   })
 
   const [settingsLoading, setSettingsLoading] = useState(false)
@@ -57,8 +59,7 @@ const Admin: FC = () => {
     if (!data?.appSettings?.message) return
 
     const parsedSettings = JSON.parse(data.appSettings.message)
-
-    setSettingsState(parsedSettings)
+    setSettingsState({...settingsState, ...parsedSettings})
 
     // if (orderFormData) {
     //   if (!orderFormData.orderFormConfiguration?.taxConfiguration) {
@@ -122,11 +123,10 @@ const Admin: FC = () => {
       // If enableTaxCalulation is true, set Digital River as tax provider
       // but only if it's not already set as tax provider
       if (
-        settingsState.enableTaxCalculation &&
-        !orderFormData.orderFormConfiguration.taxConfiguration
+        settingsState.enableTaxCalculation
       ) {
         orderFormData.orderFormConfiguration.taxConfiguration = {
-          url: `http://master--${account}.myvtex.com/_v/api/digital-river/checkout/order-tax`,
+          url: `http://alexdev--${account}.myvtex.com/_v/api/digital-river/checkout/order-tax`,
           authorizationHeader: settingsState.digitalRiverToken,
           allowExecutionAfterErrors: false,
           integratedAuthentication: false,
@@ -208,6 +208,25 @@ const Admin: FC = () => {
             }
           >
             <PageBlock>
+              <section className="pb4">
+                <InputPassword
+                  label={formatMessage({
+                    id: 'admin/digital-river.settings.digitalRiverPublicKey.label',
+                  })}
+                  value={settingsState.digitalRiverPublicKey}
+                  onChange={(e: React.FormEvent<HTMLInputElement>) =>
+                    setSettingsState({
+                      ...settingsState,
+                      digitalRiverPublicKey: e.currentTarget.value,
+                    })
+                  }
+                  helpText={formatMessage({
+                    id:
+                      'admin/digital-river.settings.digitalRiverPublicKey.helpText',
+                  })}
+                  token
+                />
+              </section>
               <section className="pb4">
                 <InputPassword
                   label={formatMessage({
@@ -298,6 +317,44 @@ const Admin: FC = () => {
                   })}
                 />
               </section>
+              <section className="pv4">
+                <Toggle
+                  semantic
+                  label={formatMessage({
+                    id: 'admin/digital-river.settings.enableTaxCalculation.label',
+                  })}
+                  size="large"
+                  checked={settingsState.enableTaxCalculation}
+                  onChange={() => {
+                    setSettingsState({
+                      ...settingsState,
+                      enableTaxCalculation: !settingsState.enableTaxCalculation,
+                    })
+                  }}
+                  helpText={formatMessage({
+                    id: 'admin/digital-river.settings.enableTaxCalculation.helpText',
+                  })}
+                />
+              </section>
+              <section className="pv4">
+                <Toggle
+                  semantic
+                  label={formatMessage({
+                    id: 'admin/digital-river.settings.enableTaxInclusive.label',
+                  })}
+                  size="large"
+                  checked={settingsState.enableTaxInclusive}
+                  onChange={() => {
+                    setSettingsState({
+                      ...settingsState,
+                      enableTaxInclusive: !settingsState.enableTaxInclusive,
+                    })
+                  }}
+                  helpText={formatMessage({
+                    id: 'admin/digital-river.settings.enableTaxInclusive.helpText',
+                  })}
+                />
+              </section>
               {/* <section className="pv4">
                 <Toggle
                   semantic
@@ -326,6 +383,7 @@ const Admin: FC = () => {
                   onClick={() => handleSaveSettings(showToast)}
                   isLoading={settingsLoading}
                   disabled={
+                    !settingsState.digitalRiverPublicKey ||
                     !settingsState.digitalRiverToken ||
                     !settingsState.vtexAppKey ||
                     !settingsState.vtexAppToken

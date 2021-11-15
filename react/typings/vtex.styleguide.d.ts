@@ -43,4 +43,5 @@ declare module 'vtex.styleguide' {
   export const Tabs
   export const Divider
   export const PageBlock
+  export const IconDelete
 }

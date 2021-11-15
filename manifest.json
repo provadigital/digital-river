@@ -16,6 +16,8 @@
     ]
   },
   "dependencies": {
+    "vtex.my-account": "1.x",
+    "vtex.my-account-commons": "1.x",
     "vtex.styleguide": "9.x",
     "vtex.apps-graphql": "2.x"
   },
@@ -25,6 +27,7 @@
     "admin": "0.x",
     "react": "3.x",
     "graphql": "1.x",
+    "store": "0.x",
     "messages": "1.x"
   },
   "scripts": {

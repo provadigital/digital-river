@@ -2,6 +2,8 @@
 interface AppSettings {
   digitalRiverToken: string
   isAutomaticSync: boolean
+  vtexAppKey: string,
+  vtexAppToken: string
 }
 interface Authentication {
   username: string
@@ -82,6 +84,9 @@ interface DRCheckoutPayload {
   metadata?: CheckoutMetadata
   shippingChoice: CheckoutShippingChoice | null
   locale: string
+}
+interface DRCheckoutUpdatePayload {
+  items: CheckoutItem[]
 }
 interface DRCheckoutResponse {
   id: string
@@ -176,11 +181,37 @@ interface DROrderResponse {
   liveMode: boolean
   updatedTime: string
   metadata: CheckoutMetadata
+  invoicePDFs: DRFilePDF[]
+  creditMemoPDFs: DRFilePDF[]
+}
+interface DRFilePDF {
+  id: string
+  url: string
+}
+
+interface DRFileLinkResponse {
+  id: string
+  createdTime: string
+  expired: boolean
+  expiresTime: string
+  fileId: string
+  url: string
+  liveMode: boolean
+  name: string
+}
+interface DRFileLinkPayload {
+  fileId: string
+  expiresTime: string
 }
 interface DROrdersResponse {
   hasMore: boolean
   data: DROrderResponse[]
 }
+interface DRFileLinkResponse {
+  fileId: string
+  expiresTime: string
+}
+
 interface DRRefundPayload {
   orderId: string
   currency: string
@@ -317,6 +348,7 @@ interface OrderResponseItem {
   availableToRefundAmount: number
   fees: Fees
   metadata?: CheckoutMetadata
+  shipFrom: any
 }
 interface Owner {
   firstName: string
@@ -437,6 +469,7 @@ interface OrderTaxShippingInformation {
   neighborhood: string
   street: string
   postalCode: string
+  complement: string
 }
 
 interface TaxResponse {
@@ -450,6 +483,7 @@ interface ItemTaxResponse {
 }
 
 interface Tax {
+  id?: string
   name: string
   rate?: number
   description?: string

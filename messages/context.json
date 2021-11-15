@@ -4,6 +4,8 @@
   "admin/digital-river.catalog-logs-label": "admin/digital-river.catalog-logs-label",
   "admin/digital-river.catalogLogs.success": "admin/digital-river.catalogLogs.syncSuccess",
   "admin/digital-river.admin-menu-button": "admin/digital-river.admin-menu-button",
+  "admin/digital-river.settings.digitalRiverPublicKey.label": "admin/digital-river.settings.digitalRiverPublicKey.label",
+  "admin/digital-river.settings.digitalRiverPublicKey.helpText": "admin/digital-river.settings.digitalRiverPublicKey.helpText",
   "admin/digital-river.settings.digitalRiverToken.label": "admin/digital-river.settings.digitalRiverToken.label",
   "admin/digital-river.settings.digitalRiverToken.helpText": "admin/digital-river.settings.digitalRiverToken.helpText",
   "admin/digital-river.settings.vtexAppKey.label": "admin/digital-river.settings.vtexAppKey.label",
@@ -15,6 +17,8 @@
   "admin/digital-river.settings.isAutomaticSync.helpText": "admin/digital-river.settings.isAutomaticSync.helpText",
   "admin/digital-river.settings.enableTaxCalculation.label": "admin/digital-river.settings.enableTaxCalculation.label",
   "admin/digital-river.settings.enableTaxCalculation.helpText": "admin/digital-river.settings.enableTaxCalculation.helpText",
+  "admin/digital-river.settings.enableTaxInclusive.label": "admin/digital-river.settings.enableTaxInclusive.label",
+  "admin/digital-river.settings.enableTaxInclusive.helpText": "admin/digital-river.settings.enableTaxInclusive.helpText",
   "admin/digital-river.taxStatus.otherTaxConfiguration": "admin/digital-river.taxStatus.otherTaxConfiguration",
   "admin/digital-river.saveSettings.buttonText": "admin/digital-river.saveSettings.buttonText",
   "admin/digital-river.saveSettings.success": "admin/digital-river.saveSettings.success",
@@ -34,5 +38,6 @@
   "admin/digital-river.catalogLogs.table.executed": "admin/digital-river.catalogLogs.table.executed",
   "admin/digital-river.catalogLogs.table.error": "admin/digital-river.catalogLogs.table.error",
   "admin/digital-river.catalogLogs.table.success": "admin/digital-river.catalogLogs.table.success",
-  "admin/digital-river.catalogLogs.table.emptyLabel": "admin/digital-river.catalogLogs.table.emptyLabel"
+  "admin/digital-river.catalogLogs.table.emptyLabel": "admin/digital-river.catalogLogs.table.emptyLabel",
+  "pages/digital-river.credit-cards.link": "pages/digital-river.credit-cards.link"
 }

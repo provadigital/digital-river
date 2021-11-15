@@ -2,6 +2,9 @@
 import pThrottle from 'p-throttle'
 import type { EventContext } from '@vtex/api'
 import { ResolverError } from '@vtex/api'
+import { getSession } from '../resolvers/session/service'
+import type { SessionFields } from '../resolvers/session/sessionResolver'
+import convertIso3To2 from 'country-iso-3-to-2'
 
 import {
   countries,
@@ -11,7 +14,11 @@ import {
   SPECIFICATION_FIELD_COMBO,
   DATA_ENTITY,
   SCHEMA_NAME,
+  DATA_ENTITY_CHECKOUT,
+  schemaCheckout
 } from '../constants'
+
+export const CHECKOUT_VTEX_COM = 'checkout.vtex.com'
 
 const fields = ['_all']
 const pagination = {
@@ -78,6 +85,19 @@ export async function digitalRiverSetup(
       dataEntity: DATA_ENTITY,
       schemaName: SCHEMA_NAME,
       schemaBody: schema,
+    })
+  }
+
+  const schemaCheckoutOrder = await masterdata.getSchema({
+    dataEntity: DATA_ENTITY_CHECKOUT,
+    schema: SCHEMA_NAME,
+  })
+
+  if (!schemaCheckoutOrder) {
+    await masterdata.createOrUpdateSchema({
+      dataEntity: DATA_ENTITY_CHECKOUT,
+      schemaName: SCHEMA_NAME,
+      schemaBody: schemaCheckout,
     })
   }
 
@@ -322,3 +342,207 @@ async function createOrUpdateSku(
     })
   }
 }
+
+export async function digitalRiverProfile(
+  ctx: Context,
+  next: () => Promise<unknown>
+) {
+  
+  const { cookies, clients: { orderForm, apps } } = ctx
+  const orderFormCookie = cookies.get(CHECKOUT_VTEX_COM)
+  const orderFormId = orderFormCookie?.split('=')[1];
+  const app: string = getAppId()
+  const settings: AppSettings = await apps.getAppSettings(app)
+
+  const order = await orderForm.getOrderForm(orderFormId, settings.vtexAppKey, settings.vtexAppToken)
+
+  const sessionData: SessionFields = await getSession(ctx)
+
+  const profileData = sessionData.impersonate?.profile
+    ? sessionData.impersonate.profile
+    : sessionData.profile
+
+  const {address} = order.shippingData || {}
+  const code: any = convertIso3To2((address?.country as string)?.toUpperCase())
+  
+  const response = {
+    locale: order.clientPreferencesData?.locale ? order.clientPreferencesData?.locale.toLowerCase() : 'en_US',
+    firstName: profileData?.firstName,
+    lastName: profileData?.lastName,
+    email: profileData?.email,
+    phoneNumber: order?.clientProfileData?.phone,
+    address: {
+      line1: order.shippingData?.address && `${
+        order.shippingData?.address?.number
+          ? `${order.shippingData?.address?.number} `
+          : ''
+      }${order.shippingData?.address?.street}`,
+      line2: order.shippingData?.address?.complement,
+      city: order.shippingData?.address?.city,
+      state: order.shippingData?.address?.state,
+      postalCode: order.shippingData?.address?.postalCode,
+      country: code && 'US'
+    }
+
+  }
+  ctx.status = 200
+  ctx.body = { ...response}
+  await next()
+}
+
+export async function digitalRiverDeleteSource(
+  ctx: Context,
+  next: () => Promise<unknown>
+) {
+  
+  const { id } = ctx.vtex.route.params
+  const { clients: { digitalRiver, apps } } = ctx
+
+  const app: string = getAppId()
+  const settings: AppSettings = await apps.getAppSettings(app)
+  const sessionData: SessionFields = await getSession(ctx)
+
+  const profileData = sessionData.impersonate?.profile
+    ? sessionData.impersonate.profile
+    : sessionData.profile
+  
+  const customerId = profileData?.id as string
+  const sourceId = id as string
+  await digitalRiver.detachSourceCustomer({ settings, customerId, sourceId})
+  
+  ctx.status = 200
+  await next()
+}
+
+export async function digitalRiverAddSource(
+  ctx: Context,
+  next: () => Promise<unknown>
+) {
+  
+  const { id } = ctx.vtex.route.params
+  const { clients: { digitalRiver, apps } } = ctx
+
+  const app: string = getAppId()
+  const settings: AppSettings = await apps.getAppSettings(app)
+  const sessionData: SessionFields = await getSession(ctx)
+
+  const profileData = sessionData.impersonate?.profile
+    ? sessionData.impersonate.profile
+    : sessionData.profile
+  
+  const customerId = profileData?.id as string
+  const sourceId = id as string
+  await digitalRiver.attachSourceCustomer({ settings, customerId, sourceId})
+  //console.log('R', response)
+  ctx.status = 200
+  await next()
+}
+
+export async function digitalRiverFileLinks(
+  ctx: Context,
+  next: () => Promise<unknown>
+) {
+  const {
+    clients: { digitalRiver, apps, orders },
+    vtex: { logger, route },
+  } = ctx
+  const response = []
+  const orderId = route.params.id.toString()
+  let orderResponse = null
+  logger.info({
+    message: 'DigitalRiverFileLinks-digitalRiverFileLinks',
+    orderId
+  })
+
+  const app: string = getAppId()
+  const settings: AppSettings = await apps.getAppSettings(app)
+
+  try {
+    orderResponse = await orders.getOrder({
+      orderId,
+      ...settings
+    })
+
+    logger.info({
+      message: 'DigitalRiverFileLinks-getOrder',
+      orderId
+    })
+  } catch (err) {
+    logger.error({
+      error: err,
+      orderId,
+      message: 'DigitalRiverFileLinks-getOrderFailure',
+    })
+
+    throw new ResolverError({
+      message: `Get order by ID error using Order ID ${orderId}`,
+      error: err,
+    })
+  }
+  //TODO CHANGE FOR
+  let digitalRiverOrderResponse
+  const {paymentSystemName, tid} = orderResponse.paymentData.transactions[0].payments[0]
+  if (paymentSystemName == 'DigitalRiver') {
+    console.log('TID', tid)
+    try {
+      digitalRiverOrderResponse = await digitalRiver.getOrderById({
+        settings,
+        orderId: tid,
+      })
+  
+      logger.info({
+        message: 'DigitalRiverFileLinks-getOrderById',
+        tid,
+        data: digitalRiverOrderResponse,
+      })
+    } catch (err) {
+      logger.error({
+        error: err,
+        tid,
+        message: 'DigitalRiverFileLinks-getOrderByIdFailure',
+      })
+  
+      throw new ResolverError({
+        message: `Get order by ID error using Digital River Order ID ${
+          tid
+        }`,
+        error: err,
+      })
+    }
+    
+    const dateExpire = new Date()
+    dateExpire.setDate(dateExpire.getDate() + 30)
+    const expiresTime = `${dateExpire.getFullYear()}-${dateExpire.getMonth() + 1}-${dateExpire.getDate()}T00:00:00Z`
+    if (digitalRiverOrderResponse.invoicePDFs) {
+      for (let i = 0; i < digitalRiverOrderResponse.invoicePDFs.length; i++) {
+        const payload = {
+          fileId: digitalRiverOrderResponse.invoicePDFs[i].id,
+          expiresTime
+        }
+        const fileResponse = await digitalRiver.createFileLink({ settings, payload})
+        fileResponse.name = 'Download invoice'
+        response.push(fileResponse)
+      }
+    }
+    if (digitalRiverOrderResponse.creditMemoPDFs) {
+      for (let i = 0; i < digitalRiverOrderResponse.creditMemoPDFs.length; i++) {
+        const payload = {
+          fileId: digitalRiverOrderResponse.creditMemoPDFs[i].id,
+          expiresTime
+        }
+        const fileResponse = await digitalRiver.createFileLink({ settings, payload})
+        fileResponse.name = 'Download memo'
+        response.push(fileResponse)
+      }
+    }
+  }
+
+  ctx.status = 200
+  ctx.body = response
+  await next()
+}
+
+
+
+
+

@@ -30,6 +30,10 @@ import {
   digitalRiverCatalogSync,
   digitalRiverCatalogLogs,
   digitalRiverSkuSync,
+  digitalRiverProfile,
+  digitalRiverDeleteSource,
+  digitalRiverAddSource,
+  digitalRiverFileLinks
 } from './middlewares/digitalRiver'
 import { throttle } from './middlewares/throttle'
 
@@ -120,8 +124,12 @@ export default new Service<Clients, RecorderState, ParamsContext>({
     updateCheckout: method({ POST: [digitalRiverUpdateCheckout] }),
     getISO2CountryCode: method({ GET: [countryCode] }),
     getSources: method({ GET: [digitalRiverGetSources] }),
+    deleteSource: method({ GET: [digitalRiverDeleteSource]}),
+    addSource: method({ GET: [digitalRiverAddSource]}),
     setup: method({ POST: [digitalRiverSetup] }),
     catalogSync: method({ POST: [digitalRiverCatalogSync] }),
     catalogLogs: method({ GET: [digitalRiverCatalogLogs] }),
+    getProfile: method({ GET: [digitalRiverProfile] }),
+    getFileLinks: method({ GET: [digitalRiverFileLinks]})
   },
 })
