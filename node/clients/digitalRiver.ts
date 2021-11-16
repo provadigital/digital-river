@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { InstanceOptions, IOContext, IOResponse } from '@vtex/api'
 import { ExternalClient } from '@vtex/api'
 
@@ -122,15 +123,12 @@ export default class DigitalRiver extends ExternalClient {
     customerId: string
     sourceId: string
   }): Promise<any> {
-    return this.http.delete(
-      `/customers/${customerId}/sources/${sourceId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${settings.digitalRiverToken}`,
-          'Content-Type': `application/json`,
-        },
-      }
-    )
+    return this.http.delete(`/customers/${customerId}/sources/${sourceId}`, {
+      headers: {
+        Authorization: `Bearer ${settings.digitalRiverToken}`,
+        'Content-Type': `application/json`,
+      },
+    })
   }
 
   // createCheckout
@@ -149,10 +147,10 @@ export default class DigitalRiver extends ExternalClient {
     })
   }
 
-  //get Checkout
+  // get Checkout
   public async getCheckout({
     settings,
-    checkoutId
+    checkoutId,
   }: {
     settings: AppSettings
     checkoutId: string
@@ -165,10 +163,10 @@ export default class DigitalRiver extends ExternalClient {
     })
   }
 
-  //delete Checkout
+  // delete Checkout
   public async deleteCheckout({
     settings,
-    checkoutId
+    checkoutId,
   }: {
     settings: AppSettings
     checkoutId: string
@@ -372,8 +370,9 @@ export default class DigitalRiver extends ExternalClient {
       },
     })
   }
-   // fileLinks
-   public async createFileLink({
+
+  // fileLinks
+  public async createFileLink({
     settings,
     payload,
   }: {
