@@ -6,7 +6,7 @@ import LogisticsClient from './logistics'
 import CatalogClient from './catalog'
 import OrderFormClient from './orderform'
 import OrdersClient from './orders'
-import Session from './session'
+import IdentityClient from './identity'
 
 // Extend the default IOClients implementation with our own custom clients.
 export class Clients extends IOClients {
@@ -34,7 +34,7 @@ export class Clients extends IOClients {
     return this.getOrSet('catalog', CatalogClient)
   }
 
-  public get customSession() {
-    return this.getOrSet('customSession', Session)
+  public get identity() {
+    return this.getOrSet('identity', IdentityClient)
   }
 }

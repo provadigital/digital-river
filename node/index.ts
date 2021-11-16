@@ -33,7 +33,10 @@ import {
   digitalRiverProfile,
   digitalRiverDeleteSource,
   digitalRiverAddSource,
-  digitalRiverFileLinks
+  digitalRiverFileLinks,
+  digitalRiverCustomers,
+  digitalRiverTaxIds,
+  digitalRiverCreateTaxIds,
 } from './middlewares/digitalRiver'
 import { throttle } from './middlewares/throttle'
 
@@ -130,6 +133,11 @@ export default new Service<Clients, RecorderState, ParamsContext>({
     catalogSync: method({ POST: [digitalRiverCatalogSync] }),
     catalogLogs: method({ GET: [digitalRiverCatalogLogs] }),
     getProfile: method({ GET: [digitalRiverProfile] }),
-    getFileLinks: method({ GET: [digitalRiverFileLinks]})
+    getFileLinks: method({ GET: [digitalRiverFileLinks]}),
+    getAllCustomers: method({ GET: [digitalRiverCustomers] }),
+    taxIds: method({
+      GET: [digitalRiverTaxIds],
+      POST: [digitalRiverCreateTaxIds],
+    }),
   },
 })

@@ -65,7 +65,6 @@ export const SPECIFICATION_FIELD_TEXT = 1
 export const SPECIFICATION_FIELD_COMBO = 5
 export const DATA_ENTITY = 'dr_catalog_synclogs'
 export const SCHEMA_NAME = 'v1'
-export const DATA_ENTITY_CHECKOUT = 'dr_checkout'
 
 export const countries = [
   'AF - Afghanistan',
@@ -394,37 +393,3 @@ export const schema = {
   },
 }
 
-export const schemaCheckout = {
-  properties: {
-    orderId: {
-      type: 'string',
-    },
-    checkoutId: {
-      type: 'string',
-    }
-  },
-  'v-indexed': [
-    'orderId',
-    'checkoutId',
-  ],
-  'v-default-fields': [
-    'orderId',
-    'checkoutId',
-  ],
-  'v-cache': false,
-  'v-security': {
-    allowGetAll: true,
-    publicRead: [
-      'orderId',
-      'checkoutId',
-    ],
-    publicWrite: [
-      'orderId',
-      'checkoutId',
-    ],
-    publicFilter: [
-      'orderId',
-      'checkoutId',
-    ],
-  },
-}
