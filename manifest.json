@@ -1,7 +1,7 @@
 {
   "name": "connector-digital-river",
   "vendor": "vtexus",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "title": "Digital River",
   "description": "Implementation of Digital River payment method, credit card processing, and tax calculation",
   "mustUpdateAt": "2018-01-04",
@@ -11,9 +11,7 @@
       "url": "https://help-tickets.vtex.com/en/support?app=vtexus.connector-digital-river"
     },
     "type": "free",
-    "availableCountries": [
-      "*"
-    ]
+    "availableCountries": ["*"]
   },
   "dependencies": {
     "vtex.my-account": "1.x",
