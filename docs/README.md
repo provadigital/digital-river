@@ -225,7 +225,13 @@ async function initDigitalRiver(orderForm) {
 
   fetch(`${__RUNTIME__.rootPath || ``}/_v/api/digital-river/checkout/create`, {
     method: 'POST',
-    body: JSON.stringify({ orderFormId: orderForm.orderFormId }),
+    body: JSON.stringify({ orderFormId: orderForm.orderFormId, taxIdPayload: { // NOTE: The taxIdPayload field is optional
+      taxId: {
+        "type": "uk",
+        "value": "GB999999999"
+      },
+      customerType: "business"
+    }}),
   })
     .then((response) => {
       return response.json()
@@ -364,6 +370,133 @@ $(window).on('orderFormUpdated.vtex', function (evt, orderForm) {
 11. Click `DigitalRiver` from the **Other** list.
 12. In the `Process with affiliation` dropdown, choose the name of the affiliation that you created in step 8. Set the status to `Active` and click `Save`. Note that this will activate the payment method in checkout!
 13. After successfully testing the payment method in test mode, return to the Digital River app settings page from step 2. Replace your test `Digital River token` with a production token and turn on the `Enable Production mode` toggle. Save the settings and your checkout page will be all set to start accepting production orders.
+
+## Digital River APIs
+
+| Field            | Value                                                                                      |
+|------------------|--------------------------------------------------------------------------------------------|
+| **URI**          | /_v/api/digital-river/customers                                                            |
+| **METHOD**       | GET                                                                                        |
+| **API Usage**    | Uses the orderFormId to get a matching Digital River customer. The email in the checkout must exist in Digital River     |
+
+_Example Headers:_
+orderFormId: **orderFormId**
+
+> ⚠️ _There must be an email associated with the orderFormId_
+
+_Example Response:_
+```json
+{
+  "id": "540988630336"
+}
+```
+
+| Field            | Value                                                                                       |
+|------------------|---------------------------------------------------------------------------------------------|
+| **URI**          | /_v/api/digital-river/tax-identifiers                                                       |
+| **METHOD**       | GET                                                                                         |
+| **API Usage**    | Returns all tax ids. This API accepts the same query parameters as the [Digital River API](https://www.digitalriver.com/docs/digital-river-api-reference/#operation/listTaxIdentifiers) |
+
+_Example Headers:_
+orderFormId: **orderFormId**
+
+> ⚠️ _There must be an email associated with the orderFormId_
+
+_Example Response:_
+```json
+{
+    "id": [
+        "a77cea02-ac3c-45a5-ac7e-e32aff524bc2",
+        "f0c356fe-8779-4775-a6d3-17267816acd0",
+        "7769196c-41c1-4832-a389-399b3be318c4",
+        "39dc5358-0449-4711-af1b-c90e009638eb"
+    ]
+}
+```
+
+
+| Field            | Value                                                                                       |
+|------------------|---------------------------------------------------------------------------------------------|
+| **URI**          | /_v/api/digital-river/tax-identifiers                                                       |
+| **METHOD**       | POST                                                                                         |
+| **API Usage**    | Returns the created tax id. [Digital River API](https://www.digitalriver.com/docs/digital-river-api-reference/#operation/createTaxIdentifiers) |
+
+_Example Headers:_
+orderFormId: **orderFormId**
+
+> ⚠️ _There must be an email associated with the orderFormId_
+
+_Example Request:_
+```json
+{
+    "type": "uk",
+    "value": "GB999999999"
+}
+```
+
+_Example Response:_
+```json
+{
+    "id": "0ea76f4b-372a-41c1-9488-b0a8b13ade58",
+    "state": "verified",
+    "liveMode": false,
+    "type": "uk",
+    "value": "GB999999999",
+    "stateTransitions": {
+        "verified": "2021-10-28T20:41:20Z"
+    },
+    "createdTime": "2021-10-28T20:41:20Z",
+    "updatedTime": "2021-10-28T20:41:20Z",
+    "applicability": [
+        {
+            "country": "IM",
+            "entity": "DR_UK-ENTITY",
+            "customerType": "business"
+        },
+        {
+            "country": "IM",
+            "entity": "DR_IRELAND-ENTITY",
+            "customerType": "business"
+        },
+        {
+            "country": "GB",
+            "entity": "DR_UK-ENTITY",
+            "customerType": "business"
+        },
+        {
+            "country": "GB",
+            "entity": "DR_IRELAND-ENTITY",
+            "customerType": "business"
+        }
+    ]
+}
+```
+
+
+
+| Field            | Value                                                                                       |
+|------------------|---------------------------------------------------------------------------------------------|
+| **URI**          | /_v/api/digital-river/checkout/create                                                   |
+| **METHOD**       | POST                                                                                         |
+| **API Usage**    | Creates Checkout [Digital River API](https://www.digitalriver.com/docs/digital-river-api-reference/#operation/createCheckouts) |
+
+> ⚠️ _The taxId type must match the country where the product is shipped to. Moreover, the taxId value must be valid. The `customerType` field must be either business or individual. Please See the supported customerType with respect to the nation it is shipped to. [Supported TaxId Types](https://docs.digitalriver.com/digital-river-api/checkouts/creating-checkouts/tax-identifiers#supported-tax-identifiers)_
+
+_Example Request:_
+```json
+{
+  "orderFormId": "orderFormId",
+  "taxIdPayload": {
+    "taxId": {
+      "type": "uk",
+      "value": "GB999999999"
+    },
+    "customerType": "business" // Or "individual"
+  }
+}
+```
+
+> ⚠️ _For `/create API` to utilize the taxIdPayload, the key version must be either version 2021-02-23 or 2021-03-23 for it it to function._
 
 <!-- DOCS-IGNORE:start -->
 

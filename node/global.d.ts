@@ -82,6 +82,11 @@ interface DRCheckoutPayload {
   metadata?: CheckoutMetadata
   shippingChoice: CheckoutShippingChoice | null
   locale: string
+  customerType?: string
+  taxIdentifiers?: DRCheckoutTaxIdentifiers[]
+}
+interface DRCheckoutTaxIdentifiers {
+  id: string
 }
 interface DRCheckoutResponse {
   id: string
@@ -486,4 +491,28 @@ interface DRCustomerResponse {
   id: string
   email: string
   enabled: boolean
+}
+
+interface DRTaxIdentifiersResponse {
+  hasMore: boolean
+  data: DRTaxIdentifierResponse[]
+}
+
+interface DRTaxIdentifierResponse {
+  id: string
+  createdTime: string
+  customerId: string
+  type: string
+  value: string
+  state: string
+  stateTransitions: any
+  verifiedName: string
+  verifiedAddress: string
+  updatedTime: string
+  applicability: any[]
+}
+
+interface DRCreateTaxIdentifierRequest {
+  type: string
+  value: string
 }

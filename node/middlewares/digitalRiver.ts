@@ -2,6 +2,7 @@
 import pThrottle from 'p-throttle'
 import type { EventContext } from '@vtex/api'
 import { ResolverError } from '@vtex/api'
+import { json } from 'co-body'
 
 import {
   countries,
@@ -178,6 +179,178 @@ export async function digitalRiverCatalogSync(
     throttled(ctx, settings, skuSync)
   }
 
+  ctx.status = 200
+  await next()
+}
+
+export async function digitalRiverCustomers(
+  ctx: Context,
+  next: () => Promise<unknown>
+) {
+  const {
+    clients: { apps, digitalRiver, orderForm },
+    vtex: { logger },
+    request: { headers },
+  } = ctx
+
+  const app: string = getAppId()
+  const settings = await apps.getAppSettings(app)
+
+  const { orderformid } = headers
+
+  const orderFormData = await orderForm.getOrderForm(
+    orderformid,
+    settings.vtexAppKey,
+    settings.vtexAppToken
+  )
+
+  const email = orderFormData.clientProfileData?.email
+
+  // If orderFormId doesn't have an email associated to it, it will not authorize
+  if (!email) {
+    throw new Error('Unauthorized application!')
+  }
+
+  let customerList = null
+
+  try {
+    customerList = await digitalRiver.getCustomers({
+      settings,
+      email,
+    })
+  } catch (err) {
+    logger.error({
+      error: err,
+      message: 'DigitalRiverGetAllCustomers-getCustomers',
+    })
+
+    throw new ResolverError({
+      message: 'Get all customers failed',
+      error: err,
+    })
+  }
+
+  if (customerList.data.length === 1) {
+    ctx.body = { id: customerList.data[0].id }
+  } else {
+    ctx.body = { message: 'Account can not be found' }
+  }
+
+  ctx.status = 200
+  await next()
+}
+
+export async function digitalRiverTaxIds(
+  ctx: Context,
+  next: () => Promise<unknown>
+) {
+  const {
+    clients: { apps, digitalRiver, orderForm },
+    vtex: { logger },
+    request: { query, headers },
+  } = ctx
+
+  const app: string = getAppId()
+  const settings = await apps.getAppSettings(app)
+
+  const { orderformid } = headers
+
+  const orderFormData = await orderForm.getOrderForm(
+    orderformid,
+    settings.vtexAppKey,
+    settings.vtexAppToken
+  )
+
+  const email = orderFormData.clientProfileData?.email
+
+  // If orderFormId doesn't have an email associated to it, it will not authorize
+  if (!email) {
+    throw new Error('Unauthorized application!')
+  }
+
+  let taxIds = null
+
+  try {
+    taxIds = await digitalRiver.getTaxIds({
+      settings,
+      params: query,
+    })
+  } catch (err) {
+    logger.error({
+      error: err,
+      message: 'DigitalRiverGetAllTaxIds-getTaxIds',
+    })
+
+    throw new ResolverError({
+      message: 'Get all tax ids failed',
+      error: err,
+    })
+  }
+
+  if (taxIds.data.length > 0) {
+    ctx.body = {
+      id: taxIds.data.map((taxId: { id: any }) => {
+        return taxId.id
+      }),
+    }
+  } else {
+    ctx.body = { message: 'Tax Ids can not be found' }
+  }
+
+  ctx.status = 200
+  await next()
+}
+
+export async function digitalRiverCreateTaxIds(
+  ctx: Context,
+  next: () => Promise<unknown>
+) {
+  const {
+    clients: { apps, digitalRiver, orderForm },
+    vtex: { logger },
+    request: { headers },
+  } = ctx
+
+  const app: string = getAppId()
+  const settings = await apps.getAppSettings(app)
+
+  const taxIdBody = (await json(ctx.req)) as any
+
+  const { orderformid } = headers
+
+  const orderFormData = await orderForm.getOrderForm(
+    orderformid,
+    settings.vtexAppKey,
+    settings.vtexAppToken
+  )
+
+  const email = orderFormData.clientProfileData?.email
+
+  // If orderFormId doesn't have an email associated to it, it will not authorize
+  if (!email) {
+    throw new Error('Unauthorized application!')
+  }
+
+  let taxIdResult = null
+
+  try {
+    taxIdResult = await digitalRiver.createTaxId({
+      settings,
+      taxIdBody,
+    })
+  } catch (err) {
+    logger.error({
+      error: err,
+      message: 'DigitalRiverGetAllTaxIds-getTaxIds',
+    })
+
+    throw new ResolverError({
+      message: 'Get all tax ids failed',
+      error: err,
+    })
+  }
+
+  ctx.body = taxIdResult
   ctx.status = 200
   await next()
 }

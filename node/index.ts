@@ -30,6 +30,9 @@ import {
   digitalRiverCatalogSync,
   digitalRiverCatalogLogs,
   digitalRiverSkuSync,
+  digitalRiverCustomers,
+  digitalRiverTaxIds,
+  digitalRiverCreateTaxIds,
 } from './middlewares/digitalRiver'
 import { throttle } from './middlewares/throttle'
 
@@ -123,5 +126,10 @@ export default new Service<Clients, RecorderState, ParamsContext>({
     setup: method({ POST: [digitalRiverSetup] }),
     catalogSync: method({ POST: [digitalRiverCatalogSync] }),
     catalogLogs: method({ GET: [digitalRiverCatalogLogs] }),
+    getAllCustomers: method({ GET: [digitalRiverCustomers] }),
+    taxIds: method({
+      GET: [digitalRiverTaxIds],
+      POST: [digitalRiverCreateTaxIds],
+    }),
   },
 })

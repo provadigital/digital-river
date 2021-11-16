@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.3.0] - 2021-11-08
+
+### Added
+
+- Attached taxId to checkout whenever present
+
+## [1.2.0] - 2021-11-01
+
+### Added
+
+- Added a post request for /tax-identifiers
+- Returned customerId in createCheckout
+
+## [1.1.2] - 2021-10-25
+
+### Added
+
+- Updated the /customers and /tax-identifiers API to use orderFormId in the header for auth
+- Changed response of /tax-identifiers API to only return tax ids
+
+## [1.1.1] - 2021-10-22
+
+### Changed
+
+- Use built in (to @vtex/api) session client
+
+## [1.1.0] - 2021-10-08
+
+### Added
+
+- Added the /customers and /tax-identifiers API
+
 ## [1.0.0] - 2021-09-20
 
 ### Added
