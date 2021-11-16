@@ -1,12 +1,13 @@
+/* eslint-disable no-await-in-loop */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import pThrottle from 'p-throttle'
 import type { EventContext } from '@vtex/api'
-import { ResolverError } from '@vtex/api'
-import { getSession } from '../resolvers/session/service'
-import type { SessionFields } from '../resolvers/session/sessionResolver'
+import { ResolverError, UserInputError } from '@vtex/api'
 import convertIso3To2 from 'country-iso-3-to-2'
 import { json } from 'co-body'
 
+import { getSession } from '../resolvers/session/service'
+import type { SessionFields } from '../resolvers/session/sessionResolver'
 import {
   countries,
   schema,
@@ -14,7 +15,7 @@ import {
   SPECIFICATION_FIELD_TEXT,
   SPECIFICATION_FIELD_COMBO,
   DATA_ENTITY,
-  SCHEMA_NAME
+  SCHEMA_NAME,
 } from '../constants'
 
 export const CHECKOUT_VTEX_COM = 'checkout.vtex.com'
@@ -505,14 +506,46 @@ export async function digitalRiverProfile(
   ctx: Context,
   next: () => Promise<unknown>
 ) {
-  
-  const { cookies, clients: { orderForm, apps } } = ctx
+  const {
+    cookies,
+    clients: { orderForm, apps },
+    vtex: { logger },
+  } = ctx
+
   const orderFormCookie = cookies.get(CHECKOUT_VTEX_COM)
-  const orderFormId = orderFormCookie?.split('=')[1];
+  const orderFormId = orderFormCookie?.split('=')[1]
   const app: string = getAppId()
   const settings: AppSettings = await apps.getAppSettings(app)
 
-  const order = await orderForm.getOrderForm(orderFormId, settings.vtexAppKey, settings.vtexAppToken)
+  if (!orderFormId) {
+    throw new UserInputError('No orderForm ID provided')
+  }
+
+  let order
+
+  try {
+    order = await orderForm.getOrderForm(
+      orderFormId,
+      settings.vtexAppKey,
+      settings.vtexAppToken
+    )
+
+    logger.info({
+      message: 'DigitalRiverProfile-getOrderForm',
+      orderFormId,
+    })
+  } catch (err) {
+    logger.error({
+      error: err,
+      orderFormId,
+      message: 'DigitalRiverProfile-getOrderForm',
+    })
+
+    throw new ResolverError({
+      message: `Get order by ID ${orderFormId}`,
+      error: err,
+    })
+  }
 
   const sessionData: SessionFields = await getSession(ctx)
 
@@ -520,31 +553,35 @@ export async function digitalRiverProfile(
     ? sessionData.impersonate.profile
     : sessionData.profile
 
-  const {address} = order.shippingData || {}
+  const { address } = order.shippingData || {}
   const code: any = convertIso3To2((address?.country as string)?.toUpperCase())
-  
+
   const response = {
-    locale: order.clientPreferencesData?.locale ? order.clientPreferencesData?.locale.toLowerCase() : 'en_US',
+    locale: order.clientPreferencesData?.locale
+      ? order.clientPreferencesData?.locale.toLowerCase()
+      : 'en_US',
     firstName: profileData?.firstName,
     lastName: profileData?.lastName,
     email: profileData?.email,
     phoneNumber: order?.clientProfileData?.phone,
     address: {
-      line1: order.shippingData?.address && `${
-        order.shippingData?.address?.number
-          ? `${order.shippingData?.address?.number} `
-          : ''
-      }${order.shippingData?.address?.street}`,
+      line1:
+        order.shippingData?.address &&
+        `${
+          order.shippingData?.address?.number
+            ? `${order.shippingData?.address?.number} `
+            : ''
+        }${order.shippingData?.address?.street}`,
       line2: order.shippingData?.address?.complement,
       city: order.shippingData?.address?.city,
       state: order.shippingData?.address?.state,
       postalCode: order.shippingData?.address?.postalCode,
-      country: code && 'US'
-    }
-
+      country: code && 'US',
+    },
   }
+
   ctx.status = 200
-  ctx.body = { ...response}
+  ctx.body = { ...response }
   await next()
 }
 
@@ -552,9 +589,11 @@ export async function digitalRiverDeleteSource(
   ctx: Context,
   next: () => Promise<unknown>
 ) {
-  
   const { id } = ctx.vtex.route.params
-  const { clients: { digitalRiver, apps } } = ctx
+  const {
+    clients: { digitalRiver, apps },
+    vtex: { logger },
+  } = ctx
 
   const app: string = getAppId()
   const settings: AppSettings = await apps.getAppSettings(app)
@@ -563,11 +602,32 @@ export async function digitalRiverDeleteSource(
   const profileData = sessionData.impersonate?.profile
     ? sessionData.impersonate.profile
     : sessionData.profile
-  
+
   const customerId = profileData?.id as string
   const sourceId = id as string
-  await digitalRiver.detachSourceCustomer({ settings, customerId, sourceId})
-  
+
+  try {
+    await digitalRiver.detachSourceCustomer({ settings, customerId, sourceId })
+
+    logger.info({
+      message: 'DigitalRiverDeleteSource-detachSourceCustomer',
+      customerId,
+      sourceId,
+    })
+  } catch (err) {
+    logger.error({
+      error: err,
+      customerId,
+      sourceId,
+      message: 'DigitalRiverDeleteSource-detachSourceCustomer',
+    })
+
+    throw new ResolverError({
+      message: `Detach source customer with customerId ${customerId} and sourceId ${sourceId}`,
+      error: err,
+    })
+  }
+
   ctx.status = 200
   await next()
 }
@@ -576,9 +636,11 @@ export async function digitalRiverAddSource(
   ctx: Context,
   next: () => Promise<unknown>
 ) {
-  
   const { id } = ctx.vtex.route.params
-  const { clients: { digitalRiver, apps } } = ctx
+  const {
+    clients: { digitalRiver, apps },
+    vtex: { logger },
+  } = ctx
 
   const app: string = getAppId()
   const settings: AppSettings = await apps.getAppSettings(app)
@@ -587,11 +649,32 @@ export async function digitalRiverAddSource(
   const profileData = sessionData.impersonate?.profile
     ? sessionData.impersonate.profile
     : sessionData.profile
-  
+
   const customerId = profileData?.id as string
   const sourceId = id as string
-  await digitalRiver.attachSourceCustomer({ settings, customerId, sourceId})
-  //console.log('R', response)
+
+  try {
+    await digitalRiver.attachSourceCustomer({ settings, customerId, sourceId })
+
+    logger.info({
+      message: 'DigitalRiverAddSource-attachSourceCustomer',
+      customerId,
+      sourceId,
+    })
+  } catch (err) {
+    logger.error({
+      error: err,
+      customerId,
+      sourceId,
+      message: 'DigitalRiverAddSource-attachSourceCustomer',
+    })
+
+    throw new ResolverError({
+      message: `Attach source customer with customerId ${customerId} and sourceId ${sourceId}`,
+      error: err,
+    })
+  }
+
   ctx.status = 200
   await next()
 }
@@ -604,12 +687,14 @@ export async function digitalRiverFileLinks(
     clients: { digitalRiver, apps, orders },
     vtex: { logger, route },
   } = ctx
+
   const response = []
   const orderId = route.params.id.toString()
   let orderResponse = null
+
   logger.info({
     message: 'DigitalRiverFileLinks-digitalRiverFileLinks',
-    orderId
+    orderId,
   })
 
   const app: string = getAppId()
@@ -618,12 +703,12 @@ export async function digitalRiverFileLinks(
   try {
     orderResponse = await orders.getOrder({
       orderId,
-      ...settings
+      ...settings,
     })
 
     logger.info({
       message: 'DigitalRiverFileLinks-getOrder',
-      orderId
+      orderId,
     })
   } catch (err) {
     logger.error({
@@ -637,58 +722,87 @@ export async function digitalRiverFileLinks(
       error: err,
     })
   }
-  //TODO CHANGE FOR
+
   let digitalRiverOrderResponse
-  const {paymentSystemName, tid} = orderResponse.paymentData.transactions[0].payments[0]
-  if (paymentSystemName == 'DigitalRiver') {
-    console.log('TID', tid)
+  let paymentMethod
+
+  for (const [
+    _,
+    transaction,
+  ] of orderResponse.paymentData.transactions.entries()) {
+    paymentMethod = transaction.payments.find(
+      (payment: any) => payment.paymentSystemName === 'DigitalRiver'
+    )
+    if (paymentMethod) {
+      break
+    }
+  }
+
+  if (paymentMethod?.paymentSystemName === 'DigitalRiver') {
     try {
       digitalRiverOrderResponse = await digitalRiver.getOrderById({
         settings,
-        orderId: tid,
+        orderId: paymentMethod?.tid,
       })
-  
+
       logger.info({
         message: 'DigitalRiverFileLinks-getOrderById',
-        tid,
+        tid: paymentMethod?.tid,
         data: digitalRiverOrderResponse,
       })
     } catch (err) {
       logger.error({
         error: err,
-        tid,
+        tid: paymentMethod?.tid,
         message: 'DigitalRiverFileLinks-getOrderByIdFailure',
       })
-  
+
       throw new ResolverError({
-        message: `Get order by ID error using Digital River Order ID ${
-          tid
-        }`,
+        message: `Get order by ID error using Digital River Order ID ${paymentMethod?.tid}`,
         error: err,
       })
     }
-    
+
     const dateExpire = new Date()
+
     dateExpire.setDate(dateExpire.getDate() + 30)
-    const expiresTime = `${dateExpire.getFullYear()}-${dateExpire.getMonth() + 1}-${dateExpire.getDate()}T00:00:00Z`
+    const expiresTime = `${dateExpire.getFullYear()}-${
+      dateExpire.getMonth() + 1
+    }-${dateExpire.getDate()}T00:00:00Z`
+
     if (digitalRiverOrderResponse.invoicePDFs) {
       for (let i = 0; i < digitalRiverOrderResponse.invoicePDFs.length; i++) {
         const payload = {
           fileId: digitalRiverOrderResponse.invoicePDFs[i].id,
-          expiresTime
+          expiresTime,
         }
-        const fileResponse = await digitalRiver.createFileLink({ settings, payload})
+
+        const fileResponse = await digitalRiver.createFileLink({
+          settings,
+          payload,
+        })
+
         fileResponse.name = 'Download invoice'
         response.push(fileResponse)
       }
     }
+
     if (digitalRiverOrderResponse.creditMemoPDFs) {
-      for (let i = 0; i < digitalRiverOrderResponse.creditMemoPDFs.length; i++) {
+      for (
+        let i = 0;
+        i < digitalRiverOrderResponse.creditMemoPDFs.length;
+        i++
+      ) {
         const payload = {
           fileId: digitalRiverOrderResponse.creditMemoPDFs[i].id,
-          expiresTime
+          expiresTime,
         }
-        const fileResponse = await digitalRiver.createFileLink({ settings, payload})
+
+        const fileResponse = await digitalRiver.createFileLink({
+          settings,
+          payload,
+        })
+
         fileResponse.name = 'Download memo'
         response.push(fileResponse)
       }
@@ -699,8 +813,3 @@ export async function digitalRiverFileLinks(
   ctx.body = response
   await next()
 }
-
-
-
-
-

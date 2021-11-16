@@ -2,7 +2,7 @@
 interface AppSettings {
   digitalRiverToken: string
   isAutomaticSync: boolean
-  vtexAppKey: string,
+  vtexAppKey: string
   vtexAppToken: string
 }
 interface Authentication {
@@ -89,9 +89,6 @@ interface DRCheckoutPayload {
 }
 interface DRCheckoutTaxIdentifiers {
   id: string
-}
-interface DRCheckoutUpdatePayload {
-  items: CheckoutItem[]
 }
 interface DRCheckoutResponse {
   id: string

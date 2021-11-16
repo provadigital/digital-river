@@ -15,8 +15,7 @@
   "admin/digital-river.settings.isLive.helpText": "admin/digital-river.settings.isLive.helpText",
   "admin/digital-river.settings.isAutomaticSync.label": "admin/digital-river.settings.isAutomaticSync.label",
   "admin/digital-river.settings.isAutomaticSync.helpText": "admin/digital-river.settings.isAutomaticSync.helpText",
-  "admin/digital-river.settings.enableTaxCalculation.label": "admin/digital-river.settings.enableTaxCalculation.label",
-  "admin/digital-river.settings.enableTaxCalculation.helpText": "admin/digital-river.settings.enableTaxCalculation.helpText",
+  "admin/digital-river.settings.alert.errorText": "admin/digital-river.settings.alert.errorText",
   "admin/digital-river.settings.enableTaxInclusive.label": "admin/digital-river.settings.enableTaxInclusive.label",
   "admin/digital-river.settings.enableTaxInclusive.helpText": "admin/digital-river.settings.enableTaxInclusive.helpText",
   "admin/digital-river.taxStatus.otherTaxConfiguration": "admin/digital-river.taxStatus.otherTaxConfiguration",
@@ -39,5 +38,7 @@
   "admin/digital-river.catalogLogs.table.error": "admin/digital-river.catalogLogs.table.error",
   "admin/digital-river.catalogLogs.table.success": "admin/digital-river.catalogLogs.table.success",
   "admin/digital-river.catalogLogs.table.emptyLabel": "admin/digital-river.catalogLogs.table.emptyLabel",
-  "pages/digital-river.credit-cards.link": "pages/digital-river.credit-cards.link"
+  "pages/digital-river.credit-cards.link": "pages/digital-river.credit-cards.link",
+  "pages/digital-river.credit-cards.storedLabel": "pages/digital-river.credit-cards.storedLabel",
+  "pages/digital-river.credit-cards.warningText": "pages/digital-river.credit-cards.warningText"
 }
