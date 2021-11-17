@@ -3,6 +3,7 @@ declare module 'vtex.styleguide' {
   export const Alert
   export const Modal
   export const Box
+  export const ActionMenu
   export const Card
   export const Dropdown
   export const Spinner

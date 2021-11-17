@@ -40,5 +40,6 @@
   "admin/digital-river.catalogLogs.table.emptyLabel": "admin/digital-river.catalogLogs.table.emptyLabel",
   "pages/digital-river.credit-cards.link": "pages/digital-river.credit-cards.link",
   "pages/digital-river.credit-cards.storedLabel": "pages/digital-river.credit-cards.storedLabel",
-  "pages/digital-river.credit-cards.warningText": "pages/digital-river.credit-cards.warningText"
+  "pages/digital-river.credit-cards.warningText": "pages/digital-river.credit-cards.warningText",
+  "pages/digital-river.invoices.link": "pages/digital-river.invoices.link"
 }

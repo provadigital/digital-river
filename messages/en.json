@@ -15,9 +15,9 @@
   "admin/digital-river.settings.isLive.helpText": "Disable to use test mode, enable for production mode; make sure to use the appropriate token for the selected mode.",
   "admin/digital-river.settings.isAutomaticSync.label": "Enable automatic catalog sync",
   "admin/digital-river.settings.isAutomaticSync.helpText": "Enable automatic syncing of VTEX catalog changes to Digital River's system.",
-  "admin/digital-river.settings.alert.errorText": "To set digital river as a your payment gateway uninstall the tax provider",
-  "admin/digital-river.settings.enableTaxInclusive.label": "Enable tax inclusive",
-  "admin/digital-river.settings.enableTaxInclusive.helpText": "Activate tax inclusive for tax calculations. WARNING: Make sure to test checkout after changing this setting.",
+  "admin/digital-river.settings.alert.errorText": "Another tax calculation provider is already enabled on this account. Please disable it before proceeding.",
+  "admin/digital-river.settings.enableTaxInclusive.label": "Enable tax inclusive prices",
+  "admin/digital-river.settings.enableTaxInclusive.helpText": "Activate if your catalog uses tax-inclusive product prices. WARNING: Make sure to test checkout after changing this setting.",
   "admin/digital-river.taxStatus.otherTaxConfiguration": "(Disabled because another tax provider is already configured)",
   "admin/digital-river.saveSettings.buttonText": "Save settings",
   "admin/digital-river.saveSettings.success": "Settings have been saved",
@@ -40,5 +40,6 @@
   "admin/digital-river.catalogLogs.table.emptyLabel": "Nothing to show.",
   "pages/digital-river.credit-cards.link": "Credit Cards",
   "pages/digital-river.credit-cards.storedLabel": "Stored Cards",
-  "pages/digital-river.credit-cards.warningText": "To add credit cards you need to complete your profile data and add one billing address"
+  "pages/digital-river.credit-cards.warningText": "To add credit cards you need to complete your profile data and add one billing address",
+  "pages/digital-river.invoices.link": "Invoices"
 }

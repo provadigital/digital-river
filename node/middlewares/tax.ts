@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { json } from 'co-body'
 import convertIso3To2 from 'country-iso-3-to-2'
-import { ResolverError } from '@vtex/api'
 
 import { applicationId } from '../constants'
 
@@ -32,6 +31,15 @@ const getCheckoutPayload = (
       skuId: item.sku,
       quantity: item.quantity,
       price: item.itemPrice / item.quantity,
+      discount: item.discountPrice
+        ? {
+            amountOff: Math.abs(item.discountPrice / item.quantity),
+            quantity: item.quantity,
+          }
+        : undefined,
+      metadata: {
+        taxHubRequestId: item.id,
+      },
       ...(!!dock && {
         shipFrom: {
           address: {
@@ -157,13 +165,6 @@ export async function digitalRiverOrderTaxHandler(
         checkoutPayload,
         message: 'DigitalRiverOrderTaxHandler-createCheckout',
       })
-
-      throw new ResolverError({
-        message: `Create Digital River checkout error ${JSON.stringify(
-          checkoutPayload
-        )}`,
-        error: err,
-      })
     }
 
     if (checkoutResponse) {
@@ -248,11 +249,6 @@ export async function digitalRiverOrderTaxHandler(
           error: err,
           checkoutId: checkoutResponse.id,
           message: 'DigitalRiverOrderTaxHandler-deleteCheckout',
-        })
-
-        throw new ResolverError({
-          message: `Delete Digital River checkout error ${checkoutResponse.id}`,
-          error: err,
         })
       }
     }

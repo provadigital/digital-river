@@ -3,9 +3,8 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { Fragment, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import type { FC } from 'react'
-import { Route } from 'vtex.my-account-commons/Router'
 import { useQuery } from 'react-apollo'
 import { Alert, ButtonWithIcon, IconDelete } from 'vtex.styleguide'
 
@@ -17,7 +16,7 @@ declare global {
   }
 }
 
-const CardManagement: FC = () => {
+const CreditCardsPage: FC = () => {
   const [customer, setCustomer] = useState({})
   const [alert, setAlert] = useState({})
 
@@ -139,8 +138,8 @@ const CardManagement: FC = () => {
 
     return sources?.map((source: any) => {
       return (
-        <div style={{ marginBottom: '8px' }}>
-          <label style={{ marginRight: '8px' }} htmlFor={source.id}>{`${
+        <div className="mb3">
+          <label className="mr3" htmlFor={source.id}>{`${
             source.creditCard.brand
           } ending with ${
             source.creditCard.lastFourDigits
@@ -162,6 +161,7 @@ const CardManagement: FC = () => {
 
     const parsedSettings = JSON.parse(data.appSettings.message)
 
+    if (!parsedSettings?.digitalRiverPublicKey) return
     loadDigitalRiver(parsedSettings.digitalRiverPublicKey)
     getCustomer()
   }, [data])
@@ -169,26 +169,18 @@ const CardManagement: FC = () => {
   const { type, message }: any = alert
 
   return (
-    <div style={{ padding: '32px', maxWidth: '600px', margin: 'auto' }}>
-      <div style={{ marginBottom: '32px' }}>
+    <div className="pa7 mw7" style={{ margin: 'auto' }}>
+      <div className="mb7">
         {sources?.length > 0 ? <h3>Stored Cards</h3> : null}
         {getCards()}
       </div>
       {message ? (
-        <div style={{ marginBottom: '32px' }}>
+        <div className="mb7">
           <Alert type={type}>{message}</Alert>
         </div>
       ) : null}
       <div id="drop-in" />
     </div>
-  )
-}
-
-const CreditCardsPage: FC = () => {
-  return (
-    <Fragment>
-      <Route exact path="/credit-cards" component={CardManagement} />
-    </Fragment>
   )
 }
 

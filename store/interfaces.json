@@ -1,8 +1,8 @@
 {
-  "my-account-page.digital-river-credit-cards-page": {
-    "component": "CreditCardsPage"
+  "my-account-page.my-app-page": {
+    "component": "MyAppPage"
   },
-  "my-account-link.digital-river-credit-cards-link": {
-    "component": "CreditCardsLink"
+  "my-account-link.my-app-link": {
+    "component": "MyAppLink"
   }
 }

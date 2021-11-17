@@ -35,6 +35,7 @@ import {
   digitalRiverAddSource,
   digitalRiverFileLinks,
   digitalRiverCustomers,
+  digitalRiverInvoices,
   digitalRiverTaxIds,
   digitalRiverCreateTaxIds,
 } from './middlewares/digitalRiver'
@@ -134,6 +135,7 @@ export default new Service<Clients, RecorderState, ParamsContext>({
     catalogLogs: method({ GET: [digitalRiverCatalogLogs] }),
     getProfile: method({ GET: [digitalRiverProfile] }),
     getFileLinks: method({ GET: [digitalRiverFileLinks] }),
+    getInvoices: method({ GET: [digitalRiverInvoices] }),
     getAllCustomers: method({ GET: [digitalRiverCustomers] }),
     taxIds: method({
       GET: [digitalRiverTaxIds],

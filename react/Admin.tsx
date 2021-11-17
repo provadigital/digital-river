@@ -51,7 +51,7 @@ const Admin: FC = () => {
     ssr: false,
   })
 
-  const { appId = '' } =
+  const { appId = null } =
     orderFormData?.orderFormConfiguration?.taxConfiguration ?? {}
 
   const [saveSettings] = useMutation(SaveAppSettings)
@@ -64,8 +64,10 @@ const Admin: FC = () => {
 
     const parsedSettings = JSON.parse(data.appSettings.message)
 
-    setSettingsState({ ...settingsState, ...parsedSettings })
-  }, [data, account, formatMessage, settingsState])
+    setSettingsState((prevState) => {
+      return { ...prevState, ...parsedSettings }
+    })
+  }, [data, account, formatMessage])
 
   const handleSaveSettings = async (showToast: any) => {
     setSettingsLoading(true)
@@ -99,7 +101,7 @@ const Admin: FC = () => {
         updateOrderForm = true
       }
 
-      if (appId === 'vtexus.connector-digital-river' || appId === '') {
+      if (appId === 'vtexus.connector-digital-river' || appId === null) {
         orderFormData.orderFormConfiguration.taxConfiguration = {
           url: `http://master--${account}.myvtex.com/_v/api/digital-river/checkout/order-tax`,
           authorizationHeader: settingsState.digitalRiverToken,
@@ -167,12 +169,12 @@ const Admin: FC = () => {
             }
           >
             <PageBlock>
-              {appId !== 'vtexus.connector-digital-river' && appId !== '' && (
+              {appId !== 'vtexus.connector-digital-river' && appId !== null && (
                 <section className="pb4">
                   <Alert type="error">
-                    {`${formatMessage({
+                    {formatMessage({
                       id: 'admin/digital-river.settings.alert.errorText',
-                    })} ${appId}`}
+                    })}
                   </Alert>
                 </section>
               )}
@@ -314,7 +316,7 @@ const Admin: FC = () => {
                   isLoading={settingsLoading}
                   disabled={
                     (appId !== 'vtexus.connector-digital-river' &&
-                      appId !== '') ||
+                      appId !== null) ||
                     !settingsState.digitalRiverPublicKey ||
                     !settingsState.digitalRiverToken ||
                     !settingsState.vtexAppKey ||

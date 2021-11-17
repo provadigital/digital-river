@@ -1,10 +1,10 @@
+/* eslint-disable padding-line-between-statements */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable vtex/prefer-early-return */
 import { useEffect } from 'react'
 import type { FC } from 'react'
-
-import OrderLinks from './OrderLinks'
+import { injectIntl } from 'react-intl'
 
 const loadDigitalRiver = () => {
   const s = document.getElementById('digital-river-script')
@@ -30,7 +30,7 @@ const loadDigitalRiver = () => {
   }
 }
 
-const CreditCardsLink: FC = ({ render }: any) => {
+const CreditCardsLink: FC = ({ render, intl }: any) => {
   useEffect(() => {
     loadDigitalRiver()
   }, [])
@@ -43,16 +43,17 @@ const CreditCardsLink: FC = ({ render }: any) => {
       linkCards.style.display = 'none'
     }
   })
-  useEffect(() => {
-    OrderLinks()
-  }, [window.location.hash])
 
   return render([
     {
-      name: 'Credit Cards',
+      name: intl.formatMessage({ id: 'mycards.link' }),
       path: '/credit-cards',
+    },
+    {
+      name: 'Invoices',
+      path: '/invoices',
     },
   ])
 }
 
-export default CreditCardsLink
+export default injectIntl(CreditCardsLink) as FC

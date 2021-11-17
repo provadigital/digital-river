@@ -121,6 +121,14 @@ interface DRCheckoutResponse {
   sellingEntity: SellingEntity
   liveMode: boolean
 }
+interface DRInvoice {
+  orderId: any
+  orderDate: any
+  totalAmount: number
+  currency: string
+  invoicePDFs: DRFilePDF[]
+  creditMemoPDFs: DRFilePDF[]
+}
 interface DRPayment {
   session: DRSession
   sources?: Source[]

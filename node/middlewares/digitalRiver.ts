@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-shadow */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import pThrottle from 'p-throttle'
@@ -805,6 +807,142 @@ export async function digitalRiverFileLinks(
 
         fileResponse.name = 'Download memo'
         response.push(fileResponse)
+      }
+    }
+  }
+
+  ctx.status = 200
+  ctx.body = response
+  await next()
+}
+
+export async function digitalRiverInvoices(
+  ctx: Context,
+  next: () => Promise<unknown>
+) {
+  const {
+    clients: { orderForm, apps, digitalRiver },
+    vtex: { logger },
+  } = ctx
+
+  const response: DRInvoice[] = []
+
+  const app: string = getAppId()
+  const settings: AppSettings = await apps.getAppSettings(app)
+
+  const sessionData: SessionFields = await getSession(ctx)
+
+  const profileData = sessionData.impersonate?.profile
+    ? sessionData.impersonate.profile
+    : sessionData.profile
+
+  if (profileData?.email) {
+    const dateExpire = new Date()
+
+    dateExpire.setDate(dateExpire.getDate() + 30)
+    const expiresTime = `${dateExpire.getFullYear()}-${
+      dateExpire.getMonth() + 1
+    }-${dateExpire.getDate()}T00:00:00Z`
+
+    let ordersDR
+
+    try {
+      ordersDR = await digitalRiver.getOrdersByEmail({
+        settings,
+        email: profileData?.email,
+      })
+      logger.info({
+        message: 'DigitalRiverInvoices-getOrdersByEmail',
+        email: profileData?.email,
+      })
+    } catch (err) {
+      logger.error({
+        error: err,
+        email: profileData?.email,
+        message: 'DigitalRiverInvoices-getOrdersByEmail',
+      })
+      throw new ResolverError({
+        message: `Get orders by email ${profileData?.email}`,
+        error: err,
+      })
+    }
+
+    for (const [_, orderDR] of ordersDR.data.entries()) {
+      let orderData
+
+      try {
+        orderData = await orderForm.getOrderFormBySequence(
+          orderDR.upstreamId,
+          settings.vtexAppKey,
+          settings.vtexAppToken
+        )
+
+        logger.info({
+          message: 'DigitalRiverProfile-getOrderFormBySequence',
+          sequence: orderDR.upstreamId,
+        })
+      } catch (err) {
+        logger.error({
+          error: err,
+          sequence: orderDR.upstreamId,
+          message: 'DigitalRiverProfile-getOrderFormBySequence',
+        })
+
+        throw new ResolverError({
+          message: `Get order by sequence ${orderDR.upstreamId}`,
+          error: err,
+        })
+      }
+
+      if (orderData) {
+        const invoicePDFs: DRFilePDF[] = []
+        const creditMemoPDFs: DRFilePDF[] = []
+        const invoiceResponse: DRInvoice = {
+          orderId: orderData.orderId,
+          orderDate: orderData.creationDate,
+          totalAmount: orderDR.totalAmount,
+          currency: orderDR.currency,
+          invoicePDFs,
+          creditMemoPDFs,
+        }
+
+        if (orderData && orderDR.invoicePDFs) {
+          for (let i = 0; i < orderDR.invoicePDFs.length; i++) {
+            const payload = {
+              fileId: orderDR.invoicePDFs[i].id,
+              expiresTime,
+            }
+
+            const fileResponse = await digitalRiver.createFileLink({
+              settings,
+              payload,
+            })
+
+            fileResponse.name = `Invoice_${orderDR.id}`
+            invoicePDFs.push(fileResponse)
+          }
+        }
+
+        if (orderData && orderDR.creditMemoPDFs) {
+          for (let i = 0; i < orderDR.creditMemoPDFs.length; i++) {
+            const payload = {
+              fileId: orderDR.creditMemoPDFs[i].id,
+              expiresTime,
+            }
+
+            const fileResponse = await digitalRiver.createFileLink({
+              settings,
+              payload,
+            })
+
+            fileResponse.name = `Credit_Memo_${orderDR.id}`
+            creditMemoPDFs.push(fileResponse)
+          }
+        }
+
+        invoiceResponse.invoicePDFs = invoicePDFs
+        invoiceResponse.creditMemoPDFs = creditMemoPDFs
+        response.push(invoiceResponse)
       }
     }
   }

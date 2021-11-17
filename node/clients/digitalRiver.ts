@@ -271,6 +271,22 @@ export default class DigitalRiver extends ExternalClient {
     })
   }
 
+  // getOrders
+  public async getOrdersByEmail({
+    settings,
+    email,
+  }: {
+    settings: AppSettings
+    email: string
+  }): Promise<any> {
+    return this.http.get(`/orders?email=${email}`, {
+      headers: {
+        Authorization: `Bearer ${settings.digitalRiverToken}`,
+        'Content-Type': `application/json`,
+      },
+    })
+  }
+
   // getOrdersByUpstreamId
   public async getOrdersByUpstreamId({
     settings,
