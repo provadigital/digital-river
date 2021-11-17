@@ -113,7 +113,6 @@ export async function digitalRiverOrderTaxHandler(
   )
 
   let checkoutResponse
-  let taxes = [] as Tax[]
   const taxesResponse = [] as ItemTaxResponse[]
 
   if (orderFormData?.items.length > 0 && !settings.isTaxInclusive) {
@@ -177,14 +176,9 @@ export async function digitalRiverOrderTaxHandler(
         shippingTaxPerItemRounded = Math.floor(shippingTaxPerItem * 100) / 100
       }
 
-      const itemTaxes = [] as Tax[]
-      const shippingTaxes = [] as Tax[]
-      const importerTaxes = [] as Tax[]
-      const dutiesTaxes = [] as Tax[]
-      const fees = [] as Tax[]
-      const feesTaxes = [] as Tax[]
+      checkoutResponse.items.forEach((item: any, index: any) => {
+        const itemTaxes = [] as Tax[]
 
-      checkoutResponse.items.forEach((item: any, _: any) => {
         if (item.tax.amount > 0) {
           itemTaxes.push({
             name: `Tax`,
@@ -194,46 +188,45 @@ export async function digitalRiverOrderTaxHandler(
         }
 
         if (shippingTaxPerItemRounded) {
-          shippingTaxes.push({
+          itemTaxes.push({
             name: `Shipping Tax`,
             value: shippingTaxPerItemRounded,
           })
         }
 
         if (item.importerTax.amount > 0) {
-          importerTaxes.push({
+          itemTaxes.push({
             name: `Importer Tax`,
             value: item.importerTax.amount,
           })
         }
 
         if (item.duties.amount > 0) {
-          dutiesTaxes.push({
+          itemTaxes.push({
             name: `Duties`,
             value: item.duties.amount,
           })
         }
 
         if (item.fees.amount > 0) {
-          fees.push({
+          itemTaxes.push({
             name: `Fees`,
             value: item.fees.amount,
           })
 
           if (item.fees.taxAmount > 0) {
-            feesTaxes.push({
+            itemTaxes.push({
               name: `Fee Tax`,
               value: item.fees.taxAmount,
             })
           }
         }
+
+        taxesResponse.push({
+          id: item.metadata?.taxHubRequestId ?? index.toString(),
+          taxes: itemTaxes,
+        })
       })
-      taxes = taxes.concat(itemTaxes)
-      taxes = taxes.concat(shippingTaxes)
-      taxes = taxes.concat(importerTaxes)
-      taxes = taxes.concat(dutiesTaxes)
-      taxes = taxes.concat(fees)
-      taxes = taxes.concat(feesTaxes)
 
       try {
         await digitalRiver.deleteCheckout({
@@ -252,11 +245,6 @@ export async function digitalRiverOrderTaxHandler(
         })
       }
     }
-
-    taxesResponse.push({
-      id: '0',
-      taxes,
-    })
   }
 
   ctx.body = {
