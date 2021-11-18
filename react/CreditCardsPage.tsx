@@ -5,6 +5,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from 'react'
 import type { FC } from 'react'
+import { useIntl } from 'react-intl'
 import { useQuery } from 'react-apollo'
 import { Alert, ButtonWithIcon, IconDelete } from 'vtex.styleguide'
 
@@ -17,6 +18,7 @@ declare global {
 }
 
 const CreditCardsPage: FC = () => {
+  const { formatMessage } = useIntl()
   const [customer, setCustomer] = useState({})
   const [alert, setAlert] = useState({})
 
@@ -114,8 +116,9 @@ const CreditCardsPage: FC = () => {
         type: 'warning',
         message: (
           <label>
-            To add credit cards you need to complete your profile data and add
-            one billing address
+            {formatMessage({
+              id: 'store/digital-river.credit-cards.warningText',
+            })}
           </label>
         ),
       })
@@ -171,7 +174,13 @@ const CreditCardsPage: FC = () => {
   return (
     <div className="pa7 mw7" style={{ margin: 'auto' }}>
       <div className="mb7">
-        {sources?.length > 0 ? <h3>Stored Cards</h3> : null}
+        {sources?.length > 0 ? (
+          <h3>
+            {formatMessage({
+              id: 'store/digital-river.credit-cards.storedLabel',
+            })}
+          </h3>
+        ) : null}
         {getCards()}
       </div>
       {message ? (

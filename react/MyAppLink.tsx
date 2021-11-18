@@ -46,11 +46,15 @@ const CreditCardsLink: FC = ({ render, intl }: any) => {
 
   return render([
     {
-      name: intl.formatMessage({ id: 'mycards.link' }),
+      name: intl.formatMessage({
+        id: 'store/digital-river.credit-cards.link',
+      }),
       path: '/credit-cards',
     },
     {
-      name: 'Invoices',
+      name: intl.formatMessage({
+        id: 'store/digital-river.invoices.link',
+      }),
       path: '/invoices',
     },
   ])

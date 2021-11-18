@@ -38,8 +38,12 @@
   "admin/digital-river.catalogLogs.table.error": "Error",
   "admin/digital-river.catalogLogs.table.success": "Success",
   "admin/digital-river.catalogLogs.table.emptyLabel": "Nothing to show.",
-  "pages/digital-river.credit-cards.link": "Credit Cards",
-  "pages/digital-river.credit-cards.storedLabel": "Stored Cards",
-  "pages/digital-river.credit-cards.warningText": "To add credit cards you need to complete your profile data and add one billing address",
-  "pages/digital-river.invoices.link": "Invoices"
+  "store/digital-river.credit-cards.link": "Credit Cards",
+  "store/digital-river.credit-cards.storedLabel": "Stored Cards",
+  "store/digital-river.credit-cards.warningText": "To add credit cards you need to complete your profile data and add one billing address",
+  "store/digital-river.invoices.link": "Invoices",
+  "store/digital-river.invoices.dateLabel": "Order date",
+  "store/digital-river.invoices.totalLabel": "Total",
+  "store/digital-river.invoices.invoiceLabel": "Download invoice",
+  "store/digital-river.invoices.creditLabel": "Download credit memo"
 }

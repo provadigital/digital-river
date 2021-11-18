@@ -2,9 +2,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from 'react'
 import type { FC } from 'react'
+import { useIntl, FormattedDate } from 'react-intl'
 import { Card, Spinner, ActionMenu } from 'vtex.styleguide'
 
 const InvoicesPage: FC = () => {
+  const { formatMessage } = useIntl()
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState([])
 
@@ -51,12 +53,26 @@ const InvoicesPage: FC = () => {
             <div className="flex justify-between">
               <div className="lh-copy">
                 <div className="mb3 fw5">{`#${invoice.orderId}`}</div>
-                <div>{`Order date: ${invoice.orderDate}`}</div>
-                <div>{`Total: ${invoice.totalAmount} ${invoice.currency}`}</div>
+                <div>
+                  {`${formatMessage({
+                    id: 'store/digital-river.invoices.dateLabel',
+                  })}: `}
+                  <FormattedDate
+                    value={invoice.orderDate}
+                    year="numeric"
+                    month="long"
+                    day="numeric"
+                  />
+                </div>
+                <div>{`${formatMessage({
+                  id: 'store/digital-river.invoices.totalLabel',
+                })}: ${invoice.totalAmount} ${invoice.currency}`}</div>
               </div>
-              <div className="flex flex-column">
+              <div className="flex flex-column items-end">
                 <ActionMenu
-                  label="Download invoice"
+                  label={formatMessage({
+                    id: 'store/digital-river.invoices.invoiceLabel',
+                  })}
                   buttonProps={{
                     variation: 'tertiary',
                     disabled: invoice.invoicePDFs.length === 0,
@@ -64,7 +80,9 @@ const InvoicesPage: FC = () => {
                   options={getPDfs(invoice.invoicePDFs)}
                 />
                 <ActionMenu
-                  label="Download credit memo"
+                  label={formatMessage({
+                    id: 'store/digital-river.invoices.creditLabel',
+                  })}
                   buttonProps={{
                     variation: 'tertiary',
                     disabled: invoice.creditMemoPDFs.length === 0,

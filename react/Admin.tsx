@@ -1,7 +1,9 @@
+/* eslint-disable no-restricted-imports */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { FC } from 'react'
 import React, { useState, useEffect } from 'react'
 import { useIntl } from 'react-intl'
+import { isEmpty } from 'ramda'
 import { useQuery, useMutation } from 'react-apollo'
 import {
   Layout,
@@ -51,8 +53,12 @@ const Admin: FC = () => {
     ssr: false,
   })
 
-  const { appId = null } =
+  const { appId } =
     orderFormData?.orderFormConfiguration?.taxConfiguration ?? {}
+
+  const hasTaxConfiguration = !isEmpty(
+    orderFormData?.orderFormConfiguration?.taxConfiguration ?? {}
+  )
 
   const [saveSettings] = useMutation(SaveAppSettings)
   const [updateOrderFormConfiguration] = useMutation(
@@ -101,7 +107,7 @@ const Admin: FC = () => {
         updateOrderForm = true
       }
 
-      if (appId === 'vtexus.connector-digital-river' || appId === null) {
+      if (appId === 'vtexus.connector-digital-river' || !hasTaxConfiguration) {
         orderFormData.orderFormConfiguration.taxConfiguration = {
           url: `http://master--${account}.myvtex.com/_v/api/digital-river/checkout/order-tax`,
           authorizationHeader: settingsState.digitalRiverToken,
@@ -169,15 +175,16 @@ const Admin: FC = () => {
             }
           >
             <PageBlock>
-              {appId !== 'vtexus.connector-digital-river' && appId !== null && (
-                <section className="pb4">
-                  <Alert type="error">
-                    {formatMessage({
-                      id: 'admin/digital-river.settings.alert.errorText',
-                    })}
-                  </Alert>
-                </section>
-              )}
+              {appId !== 'vtexus.connector-digital-river' &&
+                hasTaxConfiguration && (
+                  <section className="pb4">
+                    <Alert type="error">
+                      {formatMessage({
+                        id: 'admin/digital-river.settings.alert.errorText',
+                      })}
+                    </Alert>
+                  </section>
+                )}
 
               <section className="pb4">
                 <InputPassword
@@ -316,7 +323,7 @@ const Admin: FC = () => {
                   isLoading={settingsLoading}
                   disabled={
                     (appId !== 'vtexus.connector-digital-river' &&
-                      appId !== null) ||
+                      hasTaxConfiguration) ||
                     !settingsState.digitalRiverPublicKey ||
                     !settingsState.digitalRiverToken ||
                     !settingsState.vtexAppKey ||
