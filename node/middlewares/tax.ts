@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable max-params */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { json } from 'co-body'
@@ -14,7 +15,7 @@ const getCheckoutPayload = (
   orderForm: any,
   taxInclusive: boolean,
   docks: any[]
-) => {
+): DRCheckoutPayload => {
   const shippingCountry = checkoutDR.shippingDestination?.country
     ? convertIso3To2(checkoutDR.shippingDestination?.country)
     : 'US'
@@ -166,6 +167,10 @@ export async function digitalRiverOrderTaxHandler(
       })
     }
 
+    logger.info({
+      message: 'DigitalRiverOrderTaxHandler-createCheckout',
+      checkoutResponse,
+    })
     if (checkoutResponse) {
       const shippingTax = checkoutResponse.shippingChoice.taxAmount
       let shippingTaxPerItemRounded = 0
@@ -247,6 +252,10 @@ export async function digitalRiverOrderTaxHandler(
     }
   }
 
+  logger.info({
+    message: 'DigitalRiverOrderTaxHandler',
+    taxesResponse,
+  })
   ctx.body = {
     itemTaxResponse: taxesResponse,
     hooks: [],
