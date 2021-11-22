@@ -41,6 +41,8 @@
   "store/digital-river.credit-cards.link": "Credit Cards",
   "store/digital-river.credit-cards.storedLabel": "Stored Cards",
   "store/digital-river.credit-cards.warningText": "To add credit cards you need to complete your profile data and add one billing address",
+  "store/digital-river.credit-cards.endingWithLabel": "ending with",
+  "store/digital-river.credit-cards.expiresLabel": "expires",
   "store/digital-river.invoices.link": "Invoices",
   "store/digital-river.invoices.dateLabel": "Order date",
   "store/digital-river.invoices.totalLabel": "Total",

@@ -144,9 +144,11 @@ const CreditCardsPage: FC = () => {
         <div className="mb3">
           <label className="mr3" htmlFor={source.id}>{`${
             source.creditCard.brand
-          } ending with ${
-            source.creditCard.lastFourDigits
-          } expires ${`0${source.creditCard.expirationMonth}`.slice(-2)}/${
+          } ${formatMessage({
+            id: 'store/digital-river.credit-cards.endingWithLabel',
+          })} ${source.creditCard.lastFourDigits} ${formatMessage({
+            id: 'store/digital-river.credit-cards.expiresLabel',
+          })} ${`0${source.creditCard.expirationMonth}`.slice(-2)}/${
             source.creditCard.expirationYear
           }`}</label>
           <ButtonWithIcon
