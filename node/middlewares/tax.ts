@@ -5,6 +5,7 @@ import { json } from 'co-body'
 import convertIso3To2 from 'country-iso-3-to-2'
 
 import { applicationId } from '../constants'
+import { buildHash, getCache, setCache } from '../resolvers/cache/vbaseCache'
 
 const getAppId = (): string => {
   return process.env.VTEX_APP_ID ?? ''
@@ -107,6 +108,9 @@ export async function digitalRiverOrderTaxHandler(
   const settings = await apps.getAppSettings(app)
   const checkoutRequest = (await json(req)) as CheckoutRequest
 
+  const hashRequest = buildHash({ checkoutRequest, settings })
+  const cacheResponse = await getCache(hashRequest, ctx)
+
   const orderFormData = await orderForm.getOrderForm(
     checkoutRequest.orderFormId,
     settings.vtexAppKey,
@@ -116,31 +120,38 @@ export async function digitalRiverOrderTaxHandler(
   let checkoutResponse
   const taxesResponse = [] as ItemTaxResponse[]
 
-  if (orderFormData?.items.length > 0 && !settings.isTaxInclusive) {
+  if (
+    orderFormData?.items.length > 0 &&
+    !settings.isTaxInclusive &&
+    !cacheResponse
+  ) {
     const docks = []
 
     for (const logisticsInfo of orderFormData?.shippingData?.logisticsInfo) {
       const { selectedSla, slas } = logisticsInfo
-      const [{ dockId }] = slas.find(
-        ({ name }: { name: string }) => name === selectedSla
-      ).deliveryIds
 
-      // eslint-disable-next-line no-await-in-loop
-      let dockInfo = await logistics.getDocksById(dockId)
+      if (slas && selectedSla) {
+        const [{ dockId }] =
+          slas.find(({ name }: { name: string }) => name === selectedSla)
+            ?.deliveryIds ?? {}
 
-      if (
-        !dockInfo?.address?.city ||
-        !dockInfo?.address?.postalCode ||
-        !dockInfo?.address?.country?.acronym
-      ) {
-        logger.warn({
-          message: 'DigitalRiverOrderTaxHandler-getDocksById',
-          dockInfo,
-        })
-        dockInfo = ''
+        // eslint-disable-next-line no-await-in-loop
+        let dockInfo = await logistics.getDocksById(dockId)
+
+        if (
+          !dockInfo?.address?.city ||
+          !dockInfo?.address?.postalCode ||
+          !dockInfo?.address?.country?.acronym
+        ) {
+          logger.warn({
+            message: 'DigitalRiverOrderTaxHandler-getDocksById',
+            dockInfo,
+          })
+          dockInfo = ''
+        }
+
+        docks.push(dockInfo)
       }
-
-      docks.push(dockInfo)
     }
 
     const checkoutPayload = getCheckoutPayload(
@@ -250,17 +261,19 @@ export async function digitalRiverOrderTaxHandler(
         })
       }
     }
+
+    setCache({ ctx, hash: hashRequest, value: taxesResponse, ttl: 'SHORT' })
   }
 
   logger.info({
     message: 'DigitalRiverOrderTaxHandler',
     taxesResponse,
   })
+
   ctx.body = {
-    itemTaxResponse: taxesResponse,
+    itemTaxResponse: cacheResponse || taxesResponse,
     hooks: [],
   } as TaxResponse
-
   ctx.set('Content-Type', 'application/vnd.vtex.checkout.minicart.v1+json')
 
   await next()
