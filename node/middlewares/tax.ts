@@ -267,7 +267,7 @@ export async function digitalRiverOrderTaxHandler(
 
   logger.info({
     message: 'DigitalRiverOrderTaxHandler',
-    taxesResponse,
+    cacheResponse || taxesResponse,
   })
 
   ctx.body = {
