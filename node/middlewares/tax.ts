@@ -167,19 +167,19 @@ export async function digitalRiverOrderTaxHandler(
         checkoutPayload,
       })
       logger.info({
-        message: 'DigitalRiverOrderTaxHandler-createCheckout',
+        message: 'DigitalRiverOrderTaxHandler-createCheckoutRequest',
         checkoutPayload,
       })
     } catch (err) {
       logger.error({
         error: err,
         checkoutPayload,
-        message: 'DigitalRiverOrderTaxHandler-createCheckout',
+        message: 'DigitalRiverOrderTaxHandler-createCheckoutError',
       })
     }
 
     logger.info({
-      message: 'DigitalRiverOrderTaxHandler-createCheckout',
+      message: 'DigitalRiverOrderTaxHandler-createCheckoutResponse',
       checkoutResponse,
     })
     if (checkoutResponse) {
@@ -250,14 +250,14 @@ export async function digitalRiverOrderTaxHandler(
           checkoutId: checkoutResponse.id,
         })
         logger.info({
-          message: 'DigitalRiverOrderTaxHandler-deleteCheckout',
+          message: 'DigitalRiverOrderTaxHandler-deleteCheckoutRequest',
           checkoutId: checkoutResponse.id,
         })
       } catch (err) {
         logger.error({
           error: err,
           checkoutId: checkoutResponse.id,
-          message: 'DigitalRiverOrderTaxHandler-deleteCheckout',
+          message: 'DigitalRiverOrderTaxHandler-deleteCheckoutError',
         })
       }
     }
@@ -266,8 +266,9 @@ export async function digitalRiverOrderTaxHandler(
   }
 
   logger.info({
-    message: 'DigitalRiverOrderTaxHandler',
+    message: 'DigitalRiverOrderTaxHandler-itemTaxResponse',
     data: cacheResponse || taxesResponse,
+    fromCache: !!cacheResponse,
   })
 
   ctx.body = {
