@@ -7,7 +7,7 @@
     "p-throttle": "^4.1.1",
     "cookie": "^0.3.1",
     "lru-cache": "^5.1.1",
-    "lodash": "^4.17.13"
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
     "@types/co-body": "^0.0.3",
