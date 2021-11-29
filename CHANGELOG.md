@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+
+- Disabled automatic retry of Digital River API requests and increased timeout
+
 ## [1.3.0] - 2021-11-08
 
 ### Added
