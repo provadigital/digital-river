@@ -41,13 +41,13 @@ import {
 } from './middlewares/digitalRiver'
 import { throttle } from './middlewares/throttle'
 
-const TIMEOUT_MS = 800
+const TIMEOUT_MS = 5000
 
 const clients: ClientsConfig<Clients> = {
   implementation: Clients,
   options: {
     default: {
-      retries: 2,
+      retries: 0,
       timeout: TIMEOUT_MS,
     },
   },
