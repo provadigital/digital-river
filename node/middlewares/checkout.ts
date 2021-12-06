@@ -9,6 +9,13 @@ import type { SessionFields } from '../resolvers/session/sessionResolver'
 
 interface CreateCheckoutRequest {
   orderFormId: string
+  taxIdPayload?: {
+    taxId: {
+      type: string
+      value: string
+    }
+    customerType: string
+  }
 }
 interface UpdateCheckoutRequest {
   checkoutId: string
@@ -72,34 +79,33 @@ export async function digitalRiverCreateCheckout(
 
   const { locale = 'en_US' } = orderFormData?.clientPreferencesData
   const items = []
-  // const docks = []
+  const docks = []
 
-  // for (const logisticsInfo of orderFormData.shippingData.logisticsInfo) {
-  //   const { selectedSla, slas } = logisticsInfo
-  //   const [{ dockId }] = slas.find(
-  //     ({ name }: { name: string }) => name === selectedSla
-  //   ).deliveryIds
+  for (const logisticsInfo of orderFormData.shippingData.logisticsInfo) {
+    const { selectedSla, slas } = logisticsInfo
+    const [{ dockId }] = slas.find(
+      ({ name }: { name: string }) => name === selectedSla
+    ).deliveryIds
 
-  //   // eslint-disable-next-line no-await-in-loop
-  //   let dockInfo = await logistics.getDocksById(dockId)
+    // eslint-disable-next-line no-await-in-loop
+    let dockInfo = await logistics.getDocksById(dockId)
 
-  //   if (
-  //     !dockInfo?.address?.city ||
-  //     !dockInfo?.address?.postalCode ||
-  //     !dockInfo?.address?.country?.acronym
-  //   ) {
-  //     logger.warn({
-  //       message: 'DigitalRiverCreateCheckout-dockAddressMisconfiguration',
-  //       dockInfo,
-  //     })
-  //     dockInfo = ''
-  //   }
+    if (
+      !dockInfo?.address?.city ||
+      !dockInfo?.address?.postalCode ||
+      !dockInfo?.address?.country?.acronym
+    ) {
+      logger.warn({
+        message: 'DigitalRiverCreateCheckout-dockAddressMisconfiguration',
+        dockInfo,
+      })
+      dockInfo = ''
+    }
 
-  //   docks.push(dockInfo)
-  // }
+    docks.push(dockInfo)
+  }
 
-  // for (const [index, item] of orderFormData.items.entries()) {
-  for (const item of orderFormData.items) {
+  for (const [index, item] of orderFormData.items.entries()) {
     let discountPrice = 0
     let discountPercent = 0
     let sku = item.id
@@ -138,7 +144,7 @@ export async function digitalRiverCreateCheckout(
       }
     }
 
-    // const dock = docks[index]
+    const dock = docks[index]
 
     const newItem: CheckoutItem = {
       skuId: sku,
@@ -158,18 +164,18 @@ export async function digitalRiverCreateCheckout(
       metadata: {
         vtexItemId: item.uniqueId,
       },
-      // ...(!!dock && {
-      //   shipFrom: {
-      //     address: {
-      //       line1: dock.address.street || 'Unknown',
-      //       line2: dock.address.complement || '',
-      //       city: dock.address.city,
-      //       postalCode: dock.address.postalCode,
-      //       state: dock.address.state || '',
-      //       country: convertIso3To2(dock.address.country.acronym),
-      //     },
-      //   },
-      // }),
+      ...(!!dock && {
+        shipFrom: {
+          address: {
+            line1: dock.address.street || 'Unknown',
+            line2: dock.address.complement || '',
+            city: dock.address.city,
+            postalCode: dock.address.postalCode,
+            state: dock.address.state || '',
+            country: convertIso3To2(dock.address.country.acronym),
+          },
+        },
+      }),
     }
 
     items.push(newItem)
@@ -237,10 +243,38 @@ export async function digitalRiverCreateCheckout(
     }
   }
 
+  const taxIdPayload = createCheckoutRequest?.taxIdPayload
+
+  let taxIdResult = null
+
+  if (taxIdPayload) {
+    try {
+      taxIdResult = await digitalRiver.createTaxId({
+        settings,
+        taxIdBody: taxIdPayload.taxId,
+      })
+    } catch (err) {
+      logger.error({
+        error: err,
+        message: 'DigitalRiverCreateCheckout-createTaxIdFailed',
+      })
+
+      throw new ResolverError({
+        message: 'Create Tax Id Failed',
+        error: err,
+      })
+    }
+  }
+
+  logger.info({
+    message: 'DigitalRiverCreateCheckout-createTaxId',
+    taxIdResult,
+  })
+
   const checkoutPayload: DRCheckoutPayload = {
     applicationId,
     currency: orderFormData?.storePreferencesData?.currencyCode ?? 'USD',
-    taxInclusive: true,
+    taxInclusive: settings.isTaxInclusive,
     customerId,
     email: orderFormData.clientProfileData?.email ?? '',
     locale: locale.replace('-', '_'),
@@ -277,6 +311,11 @@ export async function digitalRiverCreateCheckout(
       description: '',
       serviceLevel: '',
     },
+  }
+
+  if (taxIdResult) {
+    checkoutPayload.customerType = taxIdPayload?.customerType
+    checkoutPayload.taxIdentifiers = [{ id: taxIdResult.id }]
   }
 
   logger.info({
