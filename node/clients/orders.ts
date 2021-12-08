@@ -3,6 +3,7 @@ import type { InstanceOptions, IOContext } from '@vtex/api'
 import { JanusClient } from '@vtex/api'
 
 const FOUR_SECONDS = 4 * 1000
+const PASSWORD = 'myWeakPass21'
 
 export default class OrdersClient extends JanusClient {
   constructor(ctx: IOContext, options?: InstanceOptions) {
