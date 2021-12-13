@@ -63,6 +63,30 @@ jobs:
         fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
         ref: ${{ github.event.pull_request.head.sha }}
 
+    # If cache exist, use it; if don't, create it
+    - name: Cache
+      uses: actions/cache@v2
+      with:
+        path: '**/node_modules'
+        key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
+    # Install base folder
+    - name: Install main app dependencies
+      run: yarn
+      if: steps.cache-node-modules.outputs.cache-hit != 'true'
+
+    # Install Node dependencies
+    - name: Install node app dependencies
+      run: yarn
+      if: steps.cache-node-modules.outputs.cache-hit != 'true'
+      working-directory: ./node
+
+    # Install React dependencies
+    - name: Install react app dependencies
+      run: yarn
+      if: steps.cache-node-modules.outputs.cache-hit != 'true'
+      working-directory: ./react
+
     - name: SonarCloud Scan
       uses: SonarSource/sonarcloud-github-action@master
       with:
