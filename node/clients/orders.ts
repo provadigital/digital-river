@@ -15,7 +15,7 @@ export default class OrdersClient extends JanusClient {
       },
       timeout: FOUR_SECONDS,
     })
-  }
+  };;
 
   public async getOrder({
     orderId,
